@@ -1,0 +1,3093 @@
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 10 tests
+test test_arena_growth_boundary_attack ... ok
+test test_concurrent_arena_access_simulation ... ok
+test test_deep_recursion_arena_explosion ... ok
+test test_free_list_corruption_attack ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_force_arena_corruption_panic - should panic ... ok
+test test_arena_id_exhaustion_attack ... FAILED
+
+failures:
+
+---- test_free_list_corruption_attack stdout ----
+Initial free lists: leaves=0, branches=0
+After deletions: leaves=0, branches=0
+
+thread 'test_free_list_corruption_attack' panicked at tests/adversarial_arena_corruption.rs:137:9:
+ATTACK SUCCESSFUL: Can't reuse tree properly, free list corrupted!
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_arena_id_exhaustion_attack stdout ----
+Cycle 0: Free leaves=0, Free branches=0
+Cycle 1: Free leaves=0, Free branches=0
+Cycle 2: Free leaves=0, Free branches=0
+Cycle 3: Free leaves=0, Free branches=0
+Cycle 4: Free leaves=0, Free branches=0
+Cycle 5: Free leaves=0, Free branches=0
+Cycle 6: Free leaves=0, Free branches=0
+Cycle 7: Free leaves=0, Free branches=0
+Cycle 8: Free leaves=0, Free branches=0
+Cycle 9: Free leaves=0, Free branches=0
+Cycle 10: Free leaves=0, Free branches=0
+Cycle 11: Free leaves=0, Free branches=0
+Cycle 12: Free leaves=0, Free branches=0
+Cycle 13: Free leaves=0, Free branches=0
+Cycle 14: Free leaves=0, Free branches=0
+Cycle 15: Free leaves=0, Free branches=0
+Cycle 16: Free leaves=0, Free branches=0
+Cycle 17: Free leaves=0, Free branches=0
+Cycle 18: Free leaves=0, Free branches=0
+Cycle 19: Free leaves=0, Free branches=0
+Cycle 20: Free leaves=0, Free branches=0
+Cycle 21: Free leaves=0, Free branches=0
+Cycle 22: Free leaves=0, Free branches=0
+Cycle 23: Free leaves=0, Free branches=0
+Cycle 24: Free leaves=0, Free branches=0
+Cycle 25: Free leaves=0, Free branches=0
+Cycle 26: Free leaves=0, Free branches=0
+Cycle 27: Free leaves=0, Free branches=0
+Cycle 28: Free leaves=0, Free branches=0
+Cycle 29: Free leaves=0, Free branches=0
+Cycle 30: Free leaves=0, Free branches=0
+Cycle 31: Free leaves=0, Free branches=0
+Cycle 32: Free leaves=0, Free branches=0
+Cycle 33: Free leaves=0, Free branches=0
+Cycle 34: Free leaves=0, Free branches=0
+Cycle 35: Free leaves=0, Free branches=0
+Cycle 36: Free leaves=0, Free branches=0
+Cycle 37: Free leaves=0, Free branches=0
+Cycle 38: Free leaves=0, Free branches=0
+Cycle 39: Free leaves=0, Free branches=0
+Cycle 40: Free leaves=0, Free branches=0
+Cycle 41: Free leaves=0, Free branches=0
+Cycle 42: Free leaves=0, Free branches=0
+Cycle 43: Free leaves=0, Free branches=0
+Cycle 44: Free leaves=0, Free branches=0
+Cycle 45: Free leaves=0, Free branches=0
+Cycle 46: Free leaves=0, Free branches=0
+Cycle 47: Free leaves=0, Free branches=0
+Cycle 48: Free leaves=0, Free branches=0
+Cycle 49: Free leaves=0, Free branches=0
+Cycle 50: Free leaves=0, Free branches=0
+Cycle 51: Free leaves=0, Free branches=0
+Cycle 52: Free leaves=0, Free branches=0
+Cycle 53: Free leaves=0, Free branches=0
+Cycle 54: Free leaves=0, Free branches=0
+Cycle 55: Free leaves=0, Free branches=0
+Cycle 56: Free leaves=0, Free branches=0
+Cycle 57: Free leaves=0, Free branches=0
+Cycle 58: Free leaves=0, Free branches=0
+Cycle 59: Free leaves=0, Free branches=0
+Cycle 60: Free leaves=0, Free branches=0
+Cycle 61: Free leaves=0, Free branches=0
+Cycle 62: Free leaves=0, Free branches=0
+Cycle 63: Free leaves=0, Free branches=0
+Cycle 64: Free leaves=0, Free branches=0
+Cycle 65: Free leaves=0, Free branches=0
+Cycle 66: Free leaves=0, Free branches=0
+Cycle 67: Free leaves=0, Free branches=0
+Cycle 68: Free leaves=0, Free branches=0
+Cycle 69: Free leaves=0, Free branches=0
+Cycle 70: Free leaves=0, Free branches=0
+Cycle 71: Free leaves=0, Free branches=0
+Cycle 72: Free leaves=0, Free branches=0
+Cycle 73: Free leaves=0, Free branches=0
+Cycle 74: Free leaves=0, Free branches=0
+Cycle 75: Free leaves=0, Free branches=0
+Cycle 76: Free leaves=0, Free branches=0
+Cycle 77: Free leaves=0, Free branches=0
+Cycle 78: Free leaves=0, Free branches=0
+Cycle 79: Free leaves=0, Free branches=0
+Cycle 80: Free leaves=0, Free branches=0
+Cycle 81: Free leaves=0, Free branches=0
+Cycle 82: Free leaves=0, Free branches=0
+Cycle 83: Free leaves=0, Free branches=0
+Cycle 84: Free leaves=0, Free branches=0
+Cycle 85: Free leaves=0, Free branches=0
+Cycle 86: Free leaves=0, Free branches=0
+Cycle 87: Free leaves=0, Free branches=0
+Cycle 88: Free leaves=0, Free branches=0
+Cycle 89: Free leaves=0, Free branches=0
+Cycle 90: Free leaves=0, Free branches=0
+Cycle 91: Free leaves=0, Free branches=0
+Cycle 92: Free leaves=0, Free branches=0
+Cycle 93: Free leaves=0, Free branches=0
+Cycle 94: Free leaves=0, Free branches=0
+Cycle 95: Free leaves=0, Free branches=0
+Cycle 96: Free leaves=0, Free branches=0
+Cycle 97: Free leaves=0, Free branches=0
+Cycle 98: Free leaves=0, Free branches=0
+Cycle 99: Free leaves=0, Free branches=0
+Cycle 100: Free leaves=0, Free branches=0
+Cycle 101: Free leaves=0, Free branches=0
+Cycle 102: Free leaves=0, Free branches=0
+Cycle 103: Free leaves=0, Free branches=0
+Cycle 104: Free leaves=0, Free branches=0
+Cycle 105: Free leaves=0, Free branches=0
+Cycle 106: Free leaves=0, Free branches=0
+Cycle 107: Free leaves=0, Free branches=0
+Cycle 108: Free leaves=0, Free branches=0
+Cycle 109: Free leaves=0, Free branches=0
+Cycle 110: Free leaves=0, Free branches=0
+Cycle 111: Free leaves=0, Free branches=0
+Cycle 112: Free leaves=0, Free branches=0
+Cycle 113: Free leaves=0, Free branches=0
+Cycle 114: Free leaves=0, Free branches=0
+Cycle 115: Free leaves=0, Free branches=0
+Cycle 116: Free leaves=0, Free branches=0
+Cycle 117: Free leaves=0, Free branches=0
+Cycle 118: Free leaves=0, Free branches=0
+Cycle 119: Free leaves=0, Free branches=0
+Cycle 120: Free leaves=0, Free branches=0
+Cycle 121: Free leaves=0, Free branches=0
+Cycle 122: Free leaves=0, Free branches=0
+Cycle 123: Free leaves=0, Free branches=0
+Cycle 124: Free leaves=0, Free branches=0
+Cycle 125: Free leaves=0, Free branches=0
+Cycle 126: Free leaves=0, Free branches=0
+Cycle 127: Free leaves=0, Free branches=0
+Cycle 128: Free leaves=0, Free branches=0
+Cycle 129: Free leaves=0, Free branches=0
+Cycle 130: Free leaves=0, Free branches=0
+Cycle 131: Free leaves=0, Free branches=0
+Cycle 132: Free leaves=0, Free branches=0
+Cycle 133: Free leaves=0, Free branches=0
+Cycle 134: Free leaves=0, Free branches=0
+Cycle 135: Free leaves=0, Free branches=0
+Cycle 136: Free leaves=0, Free branches=0
+Cycle 137: Free leaves=0, Free branches=0
+Cycle 138: Free leaves=0, Free branches=0
+Cycle 139: Free leaves=0, Free branches=0
+Cycle 140: Free leaves=0, Free branches=0
+Cycle 141: Free leaves=0, Free branches=0
+Cycle 142: Free leaves=0, Free branches=0
+Cycle 143: Free leaves=0, Free branches=0
+Cycle 144: Free leaves=0, Free branches=0
+Cycle 145: Free leaves=0, Free branches=0
+Cycle 146: Free leaves=0, Free branches=0
+Cycle 147: Free leaves=0, Free branches=0
+Cycle 148: Free leaves=0, Free branches=0
+Cycle 149: Free leaves=0, Free branches=0
+Cycle 150: Free leaves=0, Free branches=0
+Cycle 151: Free leaves=0, Free branches=0
+Cycle 152: Free leaves=0, Free branches=0
+Cycle 153: Free leaves=0, Free branches=0
+Cycle 154: Free leaves=0, Free branches=0
+Cycle 155: Free leaves=0, Free branches=0
+Cycle 156: Free leaves=0, Free branches=0
+Cycle 157: Free leaves=0, Free branches=0
+Cycle 158: Free leaves=0, Free branches=0
+Cycle 159: Free leaves=0, Free branches=0
+Cycle 160: Free leaves=0, Free branches=0
+Cycle 161: Free leaves=0, Free branches=0
+Cycle 162: Free leaves=0, Free branches=0
+Cycle 163: Free leaves=0, Free branches=0
+Cycle 164: Free leaves=0, Free branches=0
+Cycle 165: Free leaves=0, Free branches=0
+Cycle 166: Free leaves=0, Free branches=0
+Cycle 167: Free leaves=0, Free branches=0
+Cycle 168: Free leaves=0, Free branches=0
+Cycle 169: Free leaves=0, Free branches=0
+Cycle 170: Free leaves=0, Free branches=0
+Cycle 171: Free leaves=0, Free branches=0
+Cycle 172: Free leaves=0, Free branches=0
+Cycle 173: Free leaves=0, Free branches=0
+Cycle 174: Free leaves=0, Free branches=0
+Cycle 175: Free leaves=0, Free branches=0
+Cycle 176: Free leaves=0, Free branches=0
+Cycle 177: Free leaves=0, Free branches=0
+Cycle 178: Free leaves=0, Free branches=0
+Cycle 179: Free leaves=0, Free branches=0
+Cycle 180: Free leaves=0, Free branches=0
+Cycle 181: Free leaves=0, Free branches=0
+Cycle 182: Free leaves=0, Free branches=0
+Cycle 183: Free leaves=0, Free branches=0
+Cycle 184: Free leaves=0, Free branches=0
+Cycle 185: Free leaves=0, Free branches=0
+Cycle 186: Free leaves=0, Free branches=0
+Cycle 187: Free leaves=0, Free branches=0
+Cycle 188: Free leaves=0, Free branches=0
+Cycle 189: Free leaves=0, Free branches=0
+Cycle 190: Free leaves=0, Free branches=0
+Cycle 191: Free leaves=0, Free branches=0
+Cycle 192: Free leaves=0, Free branches=0
+Cycle 193: Free leaves=0, Free branches=0
+Cycle 194: Free leaves=0, Free branches=0
+Cycle 195: Free leaves=0, Free branches=0
+Cycle 196: Free leaves=0, Free branches=0
+Cycle 197: Free leaves=0, Free branches=0
+Cycle 198: Free leaves=0, Free branches=0
+Cycle 199: Free leaves=0, Free branches=0
+Cycle 200: Free leaves=0, Free branches=0
+Cycle 201: Free leaves=0, Free branches=0
+Cycle 202: Free leaves=0, Free branches=0
+Cycle 203: Free leaves=0, Free branches=0
+Cycle 204: Free leaves=0, Free branches=0
+Cycle 205: Free leaves=0, Free branches=0
+Cycle 206: Free leaves=0, Free branches=0
+Cycle 207: Free leaves=0, Free branches=0
+Cycle 208: Free leaves=0, Free branches=0
+Cycle 209: Free leaves=0, Free branches=0
+Cycle 210: Free leaves=0, Free branches=0
+Cycle 211: Free leaves=0, Free branches=0
+Cycle 212: Free leaves=0, Free branches=0
+Cycle 213: Free leaves=0, Free branches=0
+Cycle 214: Free leaves=0, Free branches=0
+Cycle 215: Free leaves=0, Free branches=0
+Cycle 216: Free leaves=0, Free branches=0
+Cycle 217: Free leaves=0, Free branches=0
+Cycle 218: Free leaves=0, Free branches=0
+Cycle 219: Free leaves=0, Free branches=0
+Cycle 220: Free leaves=0, Free branches=0
+Cycle 221: Free leaves=0, Free branches=0
+Cycle 222: Free leaves=0, Free branches=0
+Cycle 223: Free leaves=0, Free branches=0
+Cycle 224: Free leaves=0, Free branches=0
+Cycle 225: Free leaves=0, Free branches=0
+Cycle 226: Free leaves=0, Free branches=0
+Cycle 227: Free leaves=0, Free branches=0
+Cycle 228: Free leaves=0, Free branches=0
+Cycle 229: Free leaves=0, Free branches=0
+Cycle 230: Free leaves=0, Free branches=0
+Cycle 231: Free leaves=0, Free branches=0
+Cycle 232: Free leaves=0, Free branches=0
+Cycle 233: Free leaves=0, Free branches=0
+Cycle 234: Free leaves=0, Free branches=0
+Cycle 235: Free leaves=0, Free branches=0
+Cycle 236: Free leaves=0, Free branches=0
+Cycle 237: Free leaves=0, Free branches=0
+Cycle 238: Free leaves=0, Free branches=0
+Cycle 239: Free leaves=0, Free branches=0
+Cycle 240: Free leaves=0, Free branches=0
+Cycle 241: Free leaves=0, Free branches=0
+Cycle 242: Free leaves=0, Free branches=0
+Cycle 243: Free leaves=0, Free branches=0
+Cycle 244: Free leaves=0, Free branches=0
+Cycle 245: Free leaves=0, Free branches=0
+Cycle 246: Free leaves=0, Free branches=0
+Cycle 247: Free leaves=0, Free branches=0
+Cycle 248: Free leaves=0, Free branches=0
+Cycle 249: Free leaves=0, Free branches=0
+Cycle 250: Free leaves=0, Free branches=0
+Cycle 251: Free leaves=0, Free branches=0
+Cycle 252: Free leaves=0, Free branches=0
+Cycle 253: Free leaves=0, Free branches=0
+Cycle 254: Free leaves=0, Free branches=0
+Cycle 255: Free leaves=0, Free branches=0
+Cycle 256: Free leaves=0, Free branches=0
+Cycle 257: Free leaves=0, Free branches=0
+Cycle 258: Free leaves=0, Free branches=0
+Cycle 259: Free leaves=0, Free branches=0
+Cycle 260: Free leaves=0, Free branches=0
+Cycle 261: Free leaves=0, Free branches=0
+Cycle 262: Free leaves=0, Free branches=0
+Cycle 263: Free leaves=0, Free branches=0
+Cycle 264: Free leaves=0, Free branches=0
+Cycle 265: Free leaves=0, Free branches=0
+Cycle 266: Free leaves=0, Free branches=0
+Cycle 267: Free leaves=0, Free branches=0
+Cycle 268: Free leaves=0, Free branches=0
+Cycle 269: Free leaves=0, Free branches=0
+Cycle 270: Free leaves=0, Free branches=0
+Cycle 271: Free leaves=0, Free branches=0
+Cycle 272: Free leaves=0, Free branches=0
+Cycle 273: Free leaves=0, Free branches=0
+Cycle 274: Free leaves=0, Free branches=0
+Cycle 275: Free leaves=0, Free branches=0
+Cycle 276: Free leaves=0, Free branches=0
+Cycle 277: Free leaves=0, Free branches=0
+Cycle 278: Free leaves=0, Free branches=0
+Cycle 279: Free leaves=0, Free branches=0
+Cycle 280: Free leaves=0, Free branches=0
+Cycle 281: Free leaves=0, Free branches=0
+Cycle 282: Free leaves=0, Free branches=0
+Cycle 283: Free leaves=0, Free branches=0
+Cycle 284: Free leaves=0, Free branches=0
+Cycle 285: Free leaves=0, Free branches=0
+Cycle 286: Free leaves=0, Free branches=0
+Cycle 287: Free leaves=0, Free branches=0
+Cycle 288: Free leaves=0, Free branches=0
+Cycle 289: Free leaves=0, Free branches=0
+Cycle 290: Free leaves=0, Free branches=0
+Cycle 291: Free leaves=0, Free branches=0
+Cycle 292: Free leaves=0, Free branches=0
+Cycle 293: Free leaves=0, Free branches=0
+Cycle 294: Free leaves=0, Free branches=0
+Cycle 295: Free leaves=0, Free branches=0
+Cycle 296: Free leaves=0, Free branches=0
+Cycle 297: Free leaves=0, Free branches=0
+Cycle 298: Free leaves=0, Free branches=0
+Cycle 299: Free leaves=0, Free branches=0
+Cycle 300: Free leaves=0, Free branches=0
+Cycle 301: Free leaves=0, Free branches=0
+Cycle 302: Free leaves=0, Free branches=0
+Cycle 303: Free leaves=0, Free branches=0
+Cycle 304: Free leaves=0, Free branches=0
+Cycle 305: Free leaves=0, Free branches=0
+Cycle 306: Free leaves=0, Free branches=0
+Cycle 307: Free leaves=0, Free branches=0
+Cycle 308: Free leaves=0, Free branches=0
+Cycle 309: Free leaves=0, Free branches=0
+Cycle 310: Free leaves=0, Free branches=0
+Cycle 311: Free leaves=0, Free branches=0
+Cycle 312: Free leaves=0, Free branches=0
+Cycle 313: Free leaves=0, Free branches=0
+Cycle 314: Free leaves=0, Free branches=0
+Cycle 315: Free leaves=0, Free branches=0
+Cycle 316: Free leaves=0, Free branches=0
+Cycle 317: Free leaves=0, Free branches=0
+Cycle 318: Free leaves=0, Free branches=0
+Cycle 319: Free leaves=0, Free branches=0
+Cycle 320: Free leaves=0, Free branches=0
+Cycle 321: Free leaves=0, Free branches=0
+Cycle 322: Free leaves=0, Free branches=0
+Cycle 323: Free leaves=0, Free branches=0
+Cycle 324: Free leaves=0, Free branches=0
+Cycle 325: Free leaves=0, Free branches=0
+Cycle 326: Free leaves=0, Free branches=0
+Cycle 327: Free leaves=0, Free branches=0
+Cycle 328: Free leaves=0, Free branches=0
+Cycle 329: Free leaves=0, Free branches=0
+Cycle 330: Free leaves=0, Free branches=0
+Cycle 331: Free leaves=0, Free branches=0
+Cycle 332: Free leaves=0, Free branches=0
+Cycle 333: Free leaves=0, Free branches=0
+Cycle 334: Free leaves=0, Free branches=0
+Cycle 335: Free leaves=0, Free branches=0
+Cycle 336: Free leaves=0, Free branches=0
+Cycle 337: Free leaves=0, Free branches=0
+Cycle 338: Free leaves=0, Free branches=0
+Cycle 339: Free leaves=0, Free branches=0
+Cycle 340: Free leaves=0, Free branches=0
+Cycle 341: Free leaves=0, Free branches=0
+Cycle 342: Free leaves=0, Free branches=0
+Cycle 343: Free leaves=0, Free branches=0
+Cycle 344: Free leaves=0, Free branches=0
+Cycle 345: Free leaves=0, Free branches=0
+Cycle 346: Free leaves=0, Free branches=0
+Cycle 347: Free leaves=0, Free branches=0
+Cycle 348: Free leaves=0, Free branches=0
+Cycle 349: Free leaves=0, Free branches=0
+Cycle 350: Free leaves=0, Free branches=0
+Cycle 351: Free leaves=0, Free branches=0
+Cycle 352: Free leaves=0, Free branches=0
+Cycle 353: Free leaves=0, Free branches=0
+Cycle 354: Free leaves=0, Free branches=0
+Cycle 355: Free leaves=0, Free branches=0
+Cycle 356: Free leaves=0, Free branches=0
+Cycle 357: Free leaves=0, Free branches=0
+Cycle 358: Free leaves=0, Free branches=0
+Cycle 359: Free leaves=0, Free branches=0
+Cycle 360: Free leaves=0, Free branches=0
+Cycle 361: Free leaves=0, Free branches=0
+Cycle 362: Free leaves=0, Free branches=0
+Cycle 363: Free leaves=0, Free branches=0
+Cycle 364: Free leaves=0, Free branches=0
+Cycle 365: Free leaves=0, Free branches=0
+Cycle 366: Free leaves=0, Free branches=0
+Cycle 367: Free leaves=0, Free branches=0
+Cycle 368: Free leaves=0, Free branches=0
+Cycle 369: Free leaves=0, Free branches=0
+Cycle 370: Free leaves=0, Free branches=0
+Cycle 371: Free leaves=0, Free branches=0
+Cycle 372: Free leaves=0, Free branches=0
+Cycle 373: Free leaves=0, Free branches=0
+Cycle 374: Free leaves=0, Free branches=0
+Cycle 375: Free leaves=0, Free branches=0
+Cycle 376: Free leaves=0, Free branches=0
+Cycle 377: Free leaves=0, Free branches=0
+Cycle 378: Free leaves=0, Free branches=0
+Cycle 379: Free leaves=0, Free branches=0
+Cycle 380: Free leaves=0, Free branches=0
+Cycle 381: Free leaves=0, Free branches=0
+Cycle 382: Free leaves=0, Free branches=0
+Cycle 383: Free leaves=0, Free branches=0
+Cycle 384: Free leaves=0, Free branches=0
+Cycle 385: Free leaves=0, Free branches=0
+Cycle 386: Free leaves=0, Free branches=0
+Cycle 387: Free leaves=0, Free branches=0
+Cycle 388: Free leaves=0, Free branches=0
+Cycle 389: Free leaves=0, Free branches=0
+Cycle 390: Free leaves=0, Free branches=0
+Cycle 391: Free leaves=0, Free branches=0
+Cycle 392: Free leaves=0, Free branches=0
+Cycle 393: Free leaves=0, Free branches=0
+Cycle 394: Free leaves=0, Free branches=0
+Cycle 395: Free leaves=0, Free branches=0
+Cycle 396: Free leaves=0, Free branches=0
+Cycle 397: Free leaves=0, Free branches=0
+Cycle 398: Free leaves=0, Free branches=0
+Cycle 399: Free leaves=0, Free branches=0
+Cycle 400: Free leaves=0, Free branches=0
+Cycle 401: Free leaves=0, Free branches=0
+Cycle 402: Free leaves=0, Free branches=0
+Cycle 403: Free leaves=0, Free branches=0
+Cycle 404: Free leaves=0, Free branches=0
+Cycle 405: Free leaves=0, Free branches=0
+Cycle 406: Free leaves=0, Free branches=0
+Cycle 407: Free leaves=0, Free branches=0
+Cycle 408: Free leaves=0, Free branches=0
+Cycle 409: Free leaves=0, Free branches=0
+Cycle 410: Free leaves=0, Free branches=0
+Cycle 411: Free leaves=0, Free branches=0
+Cycle 412: Free leaves=0, Free branches=0
+Cycle 413: Free leaves=0, Free branches=0
+Cycle 414: Free leaves=0, Free branches=0
+Cycle 415: Free leaves=0, Free branches=0
+Cycle 416: Free leaves=0, Free branches=0
+Cycle 417: Free leaves=0, Free branches=0
+Cycle 418: Free leaves=0, Free branches=0
+Cycle 419: Free leaves=0, Free branches=0
+Cycle 420: Free leaves=0, Free branches=0
+Cycle 421: Free leaves=0, Free branches=0
+Cycle 422: Free leaves=0, Free branches=0
+Cycle 423: Free leaves=0, Free branches=0
+Cycle 424: Free leaves=0, Free branches=0
+Cycle 425: Free leaves=0, Free branches=0
+Cycle 426: Free leaves=0, Free branches=0
+Cycle 427: Free leaves=0, Free branches=0
+Cycle 428: Free leaves=0, Free branches=0
+Cycle 429: Free leaves=0, Free branches=0
+Cycle 430: Free leaves=0, Free branches=0
+Cycle 431: Free leaves=0, Free branches=0
+Cycle 432: Free leaves=0, Free branches=0
+Cycle 433: Free leaves=0, Free branches=0
+Cycle 434: Free leaves=0, Free branches=0
+Cycle 435: Free leaves=0, Free branches=0
+Cycle 436: Free leaves=0, Free branches=0
+Cycle 437: Free leaves=0, Free branches=0
+Cycle 438: Free leaves=0, Free branches=0
+Cycle 439: Free leaves=0, Free branches=0
+Cycle 440: Free leaves=0, Free branches=0
+Cycle 441: Free leaves=0, Free branches=0
+Cycle 442: Free leaves=0, Free branches=0
+Cycle 443: Free leaves=0, Free branches=0
+Cycle 444: Free leaves=0, Free branches=0
+Cycle 445: Free leaves=0, Free branches=0
+Cycle 446: Free leaves=0, Free branches=0
+Cycle 447: Free leaves=0, Free branches=0
+Cycle 448: Free leaves=0, Free branches=0
+Cycle 449: Free leaves=0, Free branches=0
+Cycle 450: Free leaves=0, Free branches=0
+Cycle 451: Free leaves=0, Free branches=0
+Cycle 452: Free leaves=0, Free branches=0
+Cycle 453: Free leaves=0, Free branches=0
+Cycle 454: Free leaves=0, Free branches=0
+Cycle 455: Free leaves=0, Free branches=0
+Cycle 456: Free leaves=0, Free branches=0
+Cycle 457: Free leaves=0, Free branches=0
+Cycle 458: Free leaves=0, Free branches=0
+Cycle 459: Free leaves=0, Free branches=0
+Cycle 460: Free leaves=0, Free branches=0
+Cycle 461: Free leaves=0, Free branches=0
+Cycle 462: Free leaves=0, Free branches=0
+Cycle 463: Free leaves=0, Free branches=0
+Cycle 464: Free leaves=0, Free branches=0
+Cycle 465: Free leaves=0, Free branches=0
+Cycle 466: Free leaves=0, Free branches=0
+Cycle 467: Free leaves=0, Free branches=0
+Cycle 468: Free leaves=0, Free branches=0
+Cycle 469: Free leaves=0, Free branches=0
+Cycle 470: Free leaves=0, Free branches=0
+Cycle 471: Free leaves=0, Free branches=0
+Cycle 472: Free leaves=0, Free branches=0
+Cycle 473: Free leaves=0, Free branches=0
+Cycle 474: Free leaves=0, Free branches=0
+Cycle 475: Free leaves=0, Free branches=0
+Cycle 476: Free leaves=0, Free branches=0
+Cycle 477: Free leaves=0, Free branches=0
+Cycle 478: Free leaves=0, Free branches=0
+Cycle 479: Free leaves=0, Free branches=0
+Cycle 480: Free leaves=0, Free branches=0
+Cycle 481: Free leaves=0, Free branches=0
+Cycle 482: Free leaves=0, Free branches=0
+Cycle 483: Free leaves=0, Free branches=0
+Cycle 484: Free leaves=0, Free branches=0
+Cycle 485: Free leaves=0, Free branches=0
+Cycle 486: Free leaves=0, Free branches=0
+Cycle 487: Free leaves=0, Free branches=0
+Cycle 488: Free leaves=0, Free branches=0
+Cycle 489: Free leaves=0, Free branches=0
+Cycle 490: Free leaves=0, Free branches=0
+Cycle 491: Free leaves=0, Free branches=0
+Cycle 492: Free leaves=0, Free branches=0
+Cycle 493: Free leaves=0, Free branches=0
+Cycle 494: Free leaves=0, Free branches=0
+Cycle 495: Free leaves=0, Free branches=0
+Cycle 496: Free leaves=0, Free branches=0
+Cycle 497: Free leaves=0, Free branches=0
+Cycle 498: Free leaves=0, Free branches=0
+Cycle 499: Free leaves=0, Free branches=0
+Cycle 500: Free leaves=0, Free branches=0
+Cycle 501: Free leaves=0, Free branches=0
+Cycle 502: Free leaves=0, Free branches=0
+Cycle 503: Free leaves=0, Free branches=0
+Cycle 504: Free leaves=0, Free branches=0
+Cycle 505: Free leaves=0, Free branches=0
+Cycle 506: Free leaves=0, Free branches=0
+Cycle 507: Free leaves=0, Free branches=0
+Cycle 508: Free leaves=0, Free branches=0
+Cycle 509: Free leaves=0, Free branches=0
+Cycle 510: Free leaves=0, Free branches=0
+Cycle 511: Free leaves=0, Free branches=0
+Cycle 512: Free leaves=0, Free branches=0
+Cycle 513: Free leaves=0, Free branches=0
+Cycle 514: Free leaves=0, Free branches=0
+Cycle 515: Free leaves=0, Free branches=0
+Cycle 516: Free leaves=0, Free branches=0
+Cycle 517: Free leaves=0, Free branches=0
+Cycle 518: Free leaves=0, Free branches=0
+Cycle 519: Free leaves=0, Free branches=0
+Cycle 520: Free leaves=0, Free branches=0
+Cycle 521: Free leaves=0, Free branches=0
+Cycle 522: Free leaves=0, Free branches=0
+Cycle 523: Free leaves=0, Free branches=0
+Cycle 524: Free leaves=0, Free branches=0
+Cycle 525: Free leaves=0, Free branches=0
+Cycle 526: Free leaves=0, Free branches=0
+Cycle 527: Free leaves=0, Free branches=0
+Cycle 528: Free leaves=0, Free branches=0
+Cycle 529: Free leaves=0, Free branches=0
+Cycle 530: Free leaves=0, Free branches=0
+Cycle 531: Free leaves=0, Free branches=0
+Cycle 532: Free leaves=0, Free branches=0
+Cycle 533: Free leaves=0, Free branches=0
+Cycle 534: Free leaves=0, Free branches=0
+Cycle 535: Free leaves=0, Free branches=0
+Cycle 536: Free leaves=0, Free branches=0
+Cycle 537: Free leaves=0, Free branches=0
+Cycle 538: Free leaves=0, Free branches=0
+Cycle 539: Free leaves=0, Free branches=0
+Cycle 540: Free leaves=0, Free branches=0
+Cycle 541: Free leaves=0, Free branches=0
+Cycle 542: Free leaves=0, Free branches=0
+Cycle 543: Free leaves=0, Free branches=0
+Cycle 544: Free leaves=0, Free branches=0
+Cycle 545: Free leaves=0, Free branches=0
+Cycle 546: Free leaves=0, Free branches=0
+Cycle 547: Free leaves=0, Free branches=0
+Cycle 548: Free leaves=0, Free branches=0
+Cycle 549: Free leaves=0, Free branches=0
+Cycle 550: Free leaves=0, Free branches=0
+Cycle 551: Free leaves=0, Free branches=0
+Cycle 552: Free leaves=0, Free branches=0
+Cycle 553: Free leaves=0, Free branches=0
+Cycle 554: Free leaves=0, Free branches=0
+Cycle 555: Free leaves=0, Free branches=0
+Cycle 556: Free leaves=0, Free branches=0
+Cycle 557: Free leaves=0, Free branches=0
+Cycle 558: Free leaves=0, Free branches=0
+Cycle 559: Free leaves=0, Free branches=0
+Cycle 560: Free leaves=0, Free branches=0
+Cycle 561: Free leaves=0, Free branches=0
+Cycle 562: Free leaves=0, Free branches=0
+Cycle 563: Free leaves=0, Free branches=0
+Cycle 564: Free leaves=0, Free branches=0
+Cycle 565: Free leaves=0, Free branches=0
+Cycle 566: Free leaves=0, Free branches=0
+Cycle 567: Free leaves=0, Free branches=0
+Cycle 568: Free leaves=0, Free branches=0
+Cycle 569: Free leaves=0, Free branches=0
+Cycle 570: Free leaves=0, Free branches=0
+Cycle 571: Free leaves=0, Free branches=0
+Cycle 572: Free leaves=0, Free branches=0
+Cycle 573: Free leaves=0, Free branches=0
+Cycle 574: Free leaves=0, Free branches=0
+Cycle 575: Free leaves=0, Free branches=0
+Cycle 576: Free leaves=0, Free branches=0
+Cycle 577: Free leaves=0, Free branches=0
+Cycle 578: Free leaves=0, Free branches=0
+Cycle 579: Free leaves=0, Free branches=0
+Cycle 580: Free leaves=0, Free branches=0
+Cycle 581: Free leaves=0, Free branches=0
+Cycle 582: Free leaves=0, Free branches=0
+Cycle 583: Free leaves=0, Free branches=0
+Cycle 584: Free leaves=0, Free branches=0
+Cycle 585: Free leaves=0, Free branches=0
+Cycle 586: Free leaves=0, Free branches=0
+Cycle 587: Free leaves=0, Free branches=0
+Cycle 588: Free leaves=0, Free branches=0
+Cycle 589: Free leaves=0, Free branches=0
+Cycle 590: Free leaves=0, Free branches=0
+Cycle 591: Free leaves=0, Free branches=0
+Cycle 592: Free leaves=0, Free branches=0
+Cycle 593: Free leaves=0, Free branches=0
+Cycle 594: Free leaves=0, Free branches=0
+Cycle 595: Free leaves=0, Free branches=0
+Cycle 596: Free leaves=0, Free branches=0
+Cycle 597: Free leaves=0, Free branches=0
+Cycle 598: Free leaves=0, Free branches=0
+Cycle 599: Free leaves=0, Free branches=0
+Cycle 600: Free leaves=0, Free branches=0
+Cycle 601: Free leaves=0, Free branches=0
+Cycle 602: Free leaves=0, Free branches=0
+Cycle 603: Free leaves=0, Free branches=0
+Cycle 604: Free leaves=0, Free branches=0
+Cycle 605: Free leaves=0, Free branches=0
+Cycle 606: Free leaves=0, Free branches=0
+Cycle 607: Free leaves=0, Free branches=0
+Cycle 608: Free leaves=0, Free branches=0
+Cycle 609: Free leaves=0, Free branches=0
+Cycle 610: Free leaves=0, Free branches=0
+Cycle 611: Free leaves=0, Free branches=0
+Cycle 612: Free leaves=0, Free branches=0
+Cycle 613: Free leaves=0, Free branches=0
+Cycle 614: Free leaves=0, Free branches=0
+Cycle 615: Free leaves=0, Free branches=0
+Cycle 616: Free leaves=0, Free branches=0
+Cycle 617: Free leaves=0, Free branches=0
+Cycle 618: Free leaves=0, Free branches=0
+Cycle 619: Free leaves=0, Free branches=0
+Cycle 620: Free leaves=0, Free branches=0
+Cycle 621: Free leaves=0, Free branches=0
+Cycle 622: Free leaves=0, Free branches=0
+Cycle 623: Free leaves=0, Free branches=0
+Cycle 624: Free leaves=0, Free branches=0
+Cycle 625: Free leaves=0, Free branches=0
+Cycle 626: Free leaves=0, Free branches=0
+Cycle 627: Free leaves=0, Free branches=0
+Cycle 628: Free leaves=0, Free branches=0
+Cycle 629: Free leaves=0, Free branches=0
+Cycle 630: Free leaves=0, Free branches=0
+Cycle 631: Free leaves=0, Free branches=0
+Cycle 632: Free leaves=0, Free branches=0
+Cycle 633: Free leaves=0, Free branches=0
+Cycle 634: Free leaves=0, Free branches=0
+Cycle 635: Free leaves=0, Free branches=0
+Cycle 636: Free leaves=0, Free branches=0
+Cycle 637: Free leaves=0, Free branches=0
+Cycle 638: Free leaves=0, Free branches=0
+Cycle 639: Free leaves=0, Free branches=0
+Cycle 640: Free leaves=0, Free branches=0
+Cycle 641: Free leaves=0, Free branches=0
+Cycle 642: Free leaves=0, Free branches=0
+Cycle 643: Free leaves=0, Free branches=0
+Cycle 644: Free leaves=0, Free branches=0
+Cycle 645: Free leaves=0, Free branches=0
+Cycle 646: Free leaves=0, Free branches=0
+Cycle 647: Free leaves=0, Free branches=0
+Cycle 648: Free leaves=0, Free branches=0
+Cycle 649: Free leaves=0, Free branches=0
+Cycle 650: Free leaves=0, Free branches=0
+Cycle 651: Free leaves=0, Free branches=0
+Cycle 652: Free leaves=0, Free branches=0
+Cycle 653: Free leaves=0, Free branches=0
+Cycle 654: Free leaves=0, Free branches=0
+Cycle 655: Free leaves=0, Free branches=0
+Cycle 656: Free leaves=0, Free branches=0
+Cycle 657: Free leaves=0, Free branches=0
+Cycle 658: Free leaves=0, Free branches=0
+Cycle 659: Free leaves=0, Free branches=0
+Cycle 660: Free leaves=0, Free branches=0
+Cycle 661: Free leaves=0, Free branches=0
+Cycle 662: Free leaves=0, Free branches=0
+Cycle 663: Free leaves=0, Free branches=0
+Cycle 664: Free leaves=0, Free branches=0
+Cycle 665: Free leaves=0, Free branches=0
+Cycle 666: Free leaves=0, Free branches=0
+Cycle 667: Free leaves=0, Free branches=0
+Cycle 668: Free leaves=0, Free branches=0
+Cycle 669: Free leaves=0, Free branches=0
+Cycle 670: Free leaves=0, Free branches=0
+Cycle 671: Free leaves=0, Free branches=0
+Cycle 672: Free leaves=0, Free branches=0
+Cycle 673: Free leaves=0, Free branches=0
+Cycle 674: Free leaves=0, Free branches=0
+Cycle 675: Free leaves=0, Free branches=0
+Cycle 676: Free leaves=0, Free branches=0
+Cycle 677: Free leaves=0, Free branches=0
+Cycle 678: Free leaves=0, Free branches=0
+Cycle 679: Free leaves=0, Free branches=0
+Cycle 680: Free leaves=0, Free branches=0
+Cycle 681: Free leaves=0, Free branches=0
+Cycle 682: Free leaves=0, Free branches=0
+Cycle 683: Free leaves=0, Free branches=0
+Cycle 684: Free leaves=0, Free branches=0
+Cycle 685: Free leaves=0, Free branches=0
+Cycle 686: Free leaves=0, Free branches=0
+Cycle 687: Free leaves=0, Free branches=0
+Cycle 688: Free leaves=0, Free branches=0
+Cycle 689: Free leaves=0, Free branches=0
+Cycle 690: Free leaves=0, Free branches=0
+Cycle 691: Free leaves=0, Free branches=0
+Cycle 692: Free leaves=0, Free branches=0
+Cycle 693: Free leaves=0, Free branches=0
+Cycle 694: Free leaves=0, Free branches=0
+Cycle 695: Free leaves=0, Free branches=0
+Cycle 696: Free leaves=0, Free branches=0
+Cycle 697: Free leaves=0, Free branches=0
+Cycle 698: Free leaves=0, Free branches=0
+Cycle 699: Free leaves=0, Free branches=0
+Cycle 700: Free leaves=0, Free branches=0
+Cycle 701: Free leaves=0, Free branches=0
+Cycle 702: Free leaves=0, Free branches=0
+Cycle 703: Free leaves=0, Free branches=0
+Cycle 704: Free leaves=0, Free branches=0
+Cycle 705: Free leaves=0, Free branches=0
+Cycle 706: Free leaves=0, Free branches=0
+Cycle 707: Free leaves=0, Free branches=0
+Cycle 708: Free leaves=0, Free branches=0
+Cycle 709: Free leaves=0, Free branches=0
+Cycle 710: Free leaves=0, Free branches=0
+Cycle 711: Free leaves=0, Free branches=0
+Cycle 712: Free leaves=0, Free branches=0
+Cycle 713: Free leaves=0, Free branches=0
+Cycle 714: Free leaves=0, Free branches=0
+Cycle 715: Free leaves=0, Free branches=0
+Cycle 716: Free leaves=0, Free branches=0
+Cycle 717: Free leaves=0, Free branches=0
+Cycle 718: Free leaves=0, Free branches=0
+Cycle 719: Free leaves=0, Free branches=0
+Cycle 720: Free leaves=0, Free branches=0
+Cycle 721: Free leaves=0, Free branches=0
+Cycle 722: Free leaves=0, Free branches=0
+Cycle 723: Free leaves=0, Free branches=0
+Cycle 724: Free leaves=0, Free branches=0
+Cycle 725: Free leaves=0, Free branches=0
+Cycle 726: Free leaves=0, Free branches=0
+Cycle 727: Free leaves=0, Free branches=0
+Cycle 728: Free leaves=0, Free branches=0
+Cycle 729: Free leaves=0, Free branches=0
+Cycle 730: Free leaves=0, Free branches=0
+Cycle 731: Free leaves=0, Free branches=0
+Cycle 732: Free leaves=0, Free branches=0
+Cycle 733: Free leaves=0, Free branches=0
+Cycle 734: Free leaves=0, Free branches=0
+Cycle 735: Free leaves=0, Free branches=0
+Cycle 736: Free leaves=0, Free branches=0
+Cycle 737: Free leaves=0, Free branches=0
+Cycle 738: Free leaves=0, Free branches=0
+Cycle 739: Free leaves=0, Free branches=0
+Cycle 740: Free leaves=0, Free branches=0
+Cycle 741: Free leaves=0, Free branches=0
+Cycle 742: Free leaves=0, Free branches=0
+Cycle 743: Free leaves=0, Free branches=0
+Cycle 744: Free leaves=0, Free branches=0
+Cycle 745: Free leaves=0, Free branches=0
+Cycle 746: Free leaves=0, Free branches=0
+Cycle 747: Free leaves=0, Free branches=0
+Cycle 748: Free leaves=0, Free branches=0
+Cycle 749: Free leaves=0, Free branches=0
+Cycle 750: Free leaves=0, Free branches=0
+Cycle 751: Free leaves=0, Free branches=0
+Cycle 752: Free leaves=0, Free branches=0
+Cycle 753: Free leaves=0, Free branches=0
+Cycle 754: Free leaves=0, Free branches=0
+Cycle 755: Free leaves=0, Free branches=0
+Cycle 756: Free leaves=0, Free branches=0
+Cycle 757: Free leaves=0, Free branches=0
+Cycle 758: Free leaves=0, Free branches=0
+Cycle 759: Free leaves=0, Free branches=0
+Cycle 760: Free leaves=0, Free branches=0
+Cycle 761: Free leaves=0, Free branches=0
+Cycle 762: Free leaves=0, Free branches=0
+Cycle 763: Free leaves=0, Free branches=0
+Cycle 764: Free leaves=0, Free branches=0
+Cycle 765: Free leaves=0, Free branches=0
+Cycle 766: Free leaves=0, Free branches=0
+Cycle 767: Free leaves=0, Free branches=0
+Cycle 768: Free leaves=0, Free branches=0
+Cycle 769: Free leaves=0, Free branches=0
+Cycle 770: Free leaves=0, Free branches=0
+Cycle 771: Free leaves=0, Free branches=0
+Cycle 772: Free leaves=0, Free branches=0
+Cycle 773: Free leaves=0, Free branches=0
+Cycle 774: Free leaves=0, Free branches=0
+Cycle 775: Free leaves=0, Free branches=0
+Cycle 776: Free leaves=0, Free branches=0
+Cycle 777: Free leaves=0, Free branches=0
+Cycle 778: Free leaves=0, Free branches=0
+Cycle 779: Free leaves=0, Free branches=0
+Cycle 780: Free leaves=0, Free branches=0
+Cycle 781: Free leaves=0, Free branches=0
+Cycle 782: Free leaves=0, Free branches=0
+Cycle 783: Free leaves=0, Free branches=0
+Cycle 784: Free leaves=0, Free branches=0
+Cycle 785: Free leaves=0, Free branches=0
+Cycle 786: Free leaves=0, Free branches=0
+Cycle 787: Free leaves=0, Free branches=0
+Cycle 788: Free leaves=0, Free branches=0
+Cycle 789: Free leaves=0, Free branches=0
+Cycle 790: Free leaves=0, Free branches=0
+Cycle 791: Free leaves=0, Free branches=0
+Cycle 792: Free leaves=0, Free branches=0
+Cycle 793: Free leaves=0, Free branches=0
+Cycle 794: Free leaves=0, Free branches=0
+Cycle 795: Free leaves=0, Free branches=0
+Cycle 796: Free leaves=0, Free branches=0
+Cycle 797: Free leaves=0, Free branches=0
+Cycle 798: Free leaves=0, Free branches=0
+Cycle 799: Free leaves=0, Free branches=0
+Cycle 800: Free leaves=0, Free branches=0
+Cycle 801: Free leaves=0, Free branches=0
+Cycle 802: Free leaves=0, Free branches=0
+Cycle 803: Free leaves=0, Free branches=0
+Cycle 804: Free leaves=0, Free branches=0
+Cycle 805: Free leaves=0, Free branches=0
+Cycle 806: Free leaves=0, Free branches=0
+Cycle 807: Free leaves=0, Free branches=0
+Cycle 808: Free leaves=0, Free branches=0
+Cycle 809: Free leaves=0, Free branches=0
+Cycle 810: Free leaves=0, Free branches=0
+Cycle 811: Free leaves=0, Free branches=0
+Cycle 812: Free leaves=0, Free branches=0
+Cycle 813: Free leaves=0, Free branches=0
+Cycle 814: Free leaves=0, Free branches=0
+Cycle 815: Free leaves=0, Free branches=0
+Cycle 816: Free leaves=0, Free branches=0
+Cycle 817: Free leaves=0, Free branches=0
+Cycle 818: Free leaves=0, Free branches=0
+Cycle 819: Free leaves=0, Free branches=0
+Cycle 820: Free leaves=0, Free branches=0
+Cycle 821: Free leaves=0, Free branches=0
+Cycle 822: Free leaves=0, Free branches=0
+Cycle 823: Free leaves=0, Free branches=0
+Cycle 824: Free leaves=0, Free branches=0
+Cycle 825: Free leaves=0, Free branches=0
+Cycle 826: Free leaves=0, Free branches=0
+Cycle 827: Free leaves=0, Free branches=0
+Cycle 828: Free leaves=0, Free branches=0
+Cycle 829: Free leaves=0, Free branches=0
+Cycle 830: Free leaves=0, Free branches=0
+Cycle 831: Free leaves=0, Free branches=0
+Cycle 832: Free leaves=0, Free branches=0
+Cycle 833: Free leaves=0, Free branches=0
+Cycle 834: Free leaves=0, Free branches=0
+Cycle 835: Free leaves=0, Free branches=0
+Cycle 836: Free leaves=0, Free branches=0
+Cycle 837: Free leaves=0, Free branches=0
+Cycle 838: Free leaves=0, Free branches=0
+Cycle 839: Free leaves=0, Free branches=0
+Cycle 840: Free leaves=0, Free branches=0
+Cycle 841: Free leaves=0, Free branches=0
+Cycle 842: Free leaves=0, Free branches=0
+Cycle 843: Free leaves=0, Free branches=0
+Cycle 844: Free leaves=0, Free branches=0
+Cycle 845: Free leaves=0, Free branches=0
+Cycle 846: Free leaves=0, Free branches=0
+Cycle 847: Free leaves=0, Free branches=0
+Cycle 848: Free leaves=0, Free branches=0
+Cycle 849: Free leaves=0, Free branches=0
+Cycle 850: Free leaves=0, Free branches=0
+Cycle 851: Free leaves=0, Free branches=0
+Cycle 852: Free leaves=0, Free branches=0
+Cycle 853: Free leaves=0, Free branches=0
+Cycle 854: Free leaves=0, Free branches=0
+Cycle 855: Free leaves=0, Free branches=0
+Cycle 856: Free leaves=0, Free branches=0
+Cycle 857: Free leaves=0, Free branches=0
+Cycle 858: Free leaves=0, Free branches=0
+Cycle 859: Free leaves=0, Free branches=0
+Cycle 860: Free leaves=0, Free branches=0
+Cycle 861: Free leaves=0, Free branches=0
+Cycle 862: Free leaves=0, Free branches=0
+Cycle 863: Free leaves=0, Free branches=0
+Cycle 864: Free leaves=0, Free branches=0
+Cycle 865: Free leaves=0, Free branches=0
+Cycle 866: Free leaves=0, Free branches=0
+Cycle 867: Free leaves=0, Free branches=0
+Cycle 868: Free leaves=0, Free branches=0
+Cycle 869: Free leaves=0, Free branches=0
+Cycle 870: Free leaves=0, Free branches=0
+Cycle 871: Free leaves=0, Free branches=0
+Cycle 872: Free leaves=0, Free branches=0
+Cycle 873: Free leaves=0, Free branches=0
+Cycle 874: Free leaves=0, Free branches=0
+Cycle 875: Free leaves=0, Free branches=0
+Cycle 876: Free leaves=0, Free branches=0
+Cycle 877: Free leaves=0, Free branches=0
+Cycle 878: Free leaves=0, Free branches=0
+Cycle 879: Free leaves=0, Free branches=0
+Cycle 880: Free leaves=0, Free branches=0
+Cycle 881: Free leaves=0, Free branches=0
+Cycle 882: Free leaves=0, Free branches=0
+Cycle 883: Free leaves=0, Free branches=0
+Cycle 884: Free leaves=0, Free branches=0
+Cycle 885: Free leaves=0, Free branches=0
+Cycle 886: Free leaves=0, Free branches=0
+Cycle 887: Free leaves=0, Free branches=0
+Cycle 888: Free leaves=0, Free branches=0
+Cycle 889: Free leaves=0, Free branches=0
+Cycle 890: Free leaves=0, Free branches=0
+Cycle 891: Free leaves=0, Free branches=0
+Cycle 892: Free leaves=0, Free branches=0
+Cycle 893: Free leaves=0, Free branches=0
+Cycle 894: Free leaves=0, Free branches=0
+Cycle 895: Free leaves=0, Free branches=0
+Cycle 896: Free leaves=0, Free branches=0
+Cycle 897: Free leaves=0, Free branches=0
+Cycle 898: Free leaves=0, Free branches=0
+Cycle 899: Free leaves=0, Free branches=0
+Cycle 900: Free leaves=0, Free branches=0
+Cycle 901: Free leaves=0, Free branches=0
+Cycle 902: Free leaves=0, Free branches=0
+Cycle 903: Free leaves=0, Free branches=0
+Cycle 904: Free leaves=0, Free branches=0
+Cycle 905: Free leaves=0, Free branches=0
+Cycle 906: Free leaves=0, Free branches=0
+Cycle 907: Free leaves=0, Free branches=0
+Cycle 908: Free leaves=0, Free branches=0
+Cycle 909: Free leaves=0, Free branches=0
+Cycle 910: Free leaves=0, Free branches=0
+Cycle 911: Free leaves=0, Free branches=0
+Cycle 912: Free leaves=0, Free branches=0
+Cycle 913: Free leaves=0, Free branches=0
+Cycle 914: Free leaves=0, Free branches=0
+Cycle 915: Free leaves=0, Free branches=0
+Cycle 916: Free leaves=0, Free branches=0
+Cycle 917: Free leaves=0, Free branches=0
+Cycle 918: Free leaves=0, Free branches=0
+Cycle 919: Free leaves=0, Free branches=0
+Cycle 920: Free leaves=0, Free branches=0
+Cycle 921: Free leaves=0, Free branches=0
+Cycle 922: Free leaves=0, Free branches=0
+Cycle 923: Free leaves=0, Free branches=0
+Cycle 924: Free leaves=0, Free branches=0
+Cycle 925: Free leaves=0, Free branches=0
+Cycle 926: Free leaves=0, Free branches=0
+Cycle 927: Free leaves=0, Free branches=0
+Cycle 928: Free leaves=0, Free branches=0
+Cycle 929: Free leaves=0, Free branches=0
+Cycle 930: Free leaves=0, Free branches=0
+Cycle 931: Free leaves=0, Free branches=0
+Cycle 932: Free leaves=0, Free branches=0
+Cycle 933: Free leaves=0, Free branches=0
+Cycle 934: Free leaves=0, Free branches=0
+Cycle 935: Free leaves=0, Free branches=0
+Cycle 936: Free leaves=0, Free branches=0
+Cycle 937: Free leaves=0, Free branches=0
+Cycle 938: Free leaves=0, Free branches=0
+Cycle 939: Free leaves=0, Free branches=0
+Cycle 940: Free leaves=0, Free branches=0
+Cycle 941: Free leaves=0, Free branches=0
+Cycle 942: Free leaves=0, Free branches=0
+Cycle 943: Free leaves=0, Free branches=0
+Cycle 944: Free leaves=0, Free branches=0
+Cycle 945: Free leaves=0, Free branches=0
+Cycle 946: Free leaves=0, Free branches=0
+Cycle 947: Free leaves=0, Free branches=0
+Cycle 948: Free leaves=0, Free branches=0
+Cycle 949: Free leaves=0, Free branches=0
+Cycle 950: Free leaves=0, Free branches=0
+Cycle 951: Free leaves=0, Free branches=0
+Cycle 952: Free leaves=0, Free branches=0
+Cycle 953: Free leaves=0, Free branches=0
+Cycle 954: Free leaves=0, Free branches=0
+Cycle 955: Free leaves=0, Free branches=0
+Cycle 956: Free leaves=0, Free branches=0
+Cycle 957: Free leaves=0, Free branches=0
+Cycle 958: Free leaves=0, Free branches=0
+Cycle 959: Free leaves=0, Free branches=0
+Cycle 960: Free leaves=0, Free branches=0
+Cycle 961: Free leaves=0, Free branches=0
+Cycle 962: Free leaves=0, Free branches=0
+Cycle 963: Free leaves=0, Free branches=0
+Cycle 964: Free leaves=0, Free branches=0
+Cycle 965: Free leaves=0, Free branches=0
+Cycle 966: Free leaves=0, Free branches=0
+Cycle 967: Free leaves=0, Free branches=0
+Cycle 968: Free leaves=0, Free branches=0
+Cycle 969: Free leaves=0, Free branches=0
+Cycle 970: Free leaves=0, Free branches=0
+Cycle 971: Free leaves=0, Free branches=0
+Cycle 972: Free leaves=0, Free branches=0
+Cycle 973: Free leaves=0, Free branches=0
+Cycle 974: Free leaves=0, Free branches=0
+Cycle 975: Free leaves=0, Free branches=0
+Cycle 976: Free leaves=0, Free branches=0
+Cycle 977: Free leaves=0, Free branches=0
+Cycle 978: Free leaves=0, Free branches=0
+Cycle 979: Free leaves=0, Free branches=0
+Cycle 980: Free leaves=0, Free branches=0
+Cycle 981: Free leaves=0, Free branches=0
+Cycle 982: Free leaves=0, Free branches=0
+Cycle 983: Free leaves=0, Free branches=0
+Cycle 984: Free leaves=0, Free branches=0
+Cycle 985: Free leaves=0, Free branches=0
+Cycle 986: Free leaves=0, Free branches=0
+Cycle 987: Free leaves=0, Free branches=0
+Cycle 988: Free leaves=0, Free branches=0
+Cycle 989: Free leaves=0, Free branches=0
+Cycle 990: Free leaves=0, Free branches=0
+Cycle 991: Free leaves=0, Free branches=0
+Cycle 992: Free leaves=0, Free branches=0
+Cycle 993: Free leaves=0, Free branches=0
+Cycle 994: Free leaves=0, Free branches=0
+Cycle 995: Free leaves=0, Free branches=0
+Cycle 996: Free leaves=0, Free branches=0
+Cycle 997: Free leaves=0, Free branches=0
+Cycle 998: Free leaves=0, Free branches=0
+Cycle 999: Free leaves=0, Free branches=0
+
+thread 'test_arena_id_exhaustion_attack' panicked at tests/adversarial_arena_corruption.rs:24:5:
+ATTACK SUCCESSFUL in arena fragmentation: Expected 500 items, got 0
+
+
+failures:
+    test_arena_id_exhaustion_attack
+    test_free_list_corruption_attack
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 4 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 10 tests
+test test_branch_borrow_from_underfull_sibling_attack ... ok
+test test_branch_merge_with_maximum_keys_attack ... ok
+test test_alternating_sibling_operations_attack ... ok
+test test_cascading_branch_rebalance_attack ... ok
+test test_deep_tree_branch_collapse_attack ... ok
+test test_force_branch_rebalance_panic - should panic ... ok
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+
+failures:
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+
+failures:
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 6 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 12 tests
+test test_get_mut_corruption_attack ... FAILED
+test test_insert_remove_same_key_attack ... FAILED
+test test_minimum_capacity_edge_cases_attack ... FAILED
+test test_extreme_key_values_attack ... FAILED
+test test_odd_capacity_arithmetic_attack ... ok
+test test_root_collapse_infinite_loop_attack ... FAILED
+test test_split_merge_thrashing_attack ... FAILED
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_ultimate_adversarial_attack - should panic ... ok
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+
+failures:
+
+---- test_get_mut_corruption_attack stdout ----
+
+thread 'test_get_mut_corruption_attack' panicked at tests/adversarial_edge_cases.rs:182:13:
+ATTACK SUCCESSFUL: Lost key 0 after get_mut!
+
+---- test_insert_remove_same_key_attack stdout ----
+
+thread 'test_insert_remove_same_key_attack' panicked at tests/adversarial_edge_cases.rs:140:17:
+ATTACK SUCCESSFUL: Wrong value removed in round 1
+
+---- test_minimum_capacity_edge_cases_attack stdout ----
+
+thread 'test_minimum_capacity_edge_cases_attack' panicked at tests/adversarial_edge_cases.rs:51:9:
+ATTACK SUCCESSFUL: Root didn't promote to branch after split!
+
+---- test_extreme_key_values_attack stdout ----
+
+thread 'test_extreme_key_values_attack' panicked at tests/adversarial_edge_cases.rs:267:9:
+ATTACK SUCCESSFUL: Range query with MIN bound failed: []
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_root_collapse_infinite_loop_attack stdout ----
+Remaining keys after collapse attack: []
+
+thread 'test_root_collapse_infinite_loop_attack' panicked at tests/test_utils.rs:335:9:
+Item count mismatch in root collapse final check: Expected 1 items, got 0
+
+---- test_split_merge_thrashing_attack stdout ----
+Thrash round 0
+
+thread 'test_split_merge_thrashing_attack' panicked at tests/adversarial_edge_cases.rs:218:13:
+ATTACK SUCCESSFUL: Lost items during thrashing! Expected 20, got 0
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+
+failures:
+    test_extreme_key_values_attack
+    test_get_mut_corruption_attack
+    test_insert_remove_same_key_attack
+    test_minimum_capacity_edge_cases_attack
+    test_root_collapse_infinite_loop_attack
+    test_split_merge_thrashing_attack
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 2 passed; 10 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 11 tests
+test test_linked_list_fragmentation_attack ... ok
+test test_iterator_state_corruption_attack ... FAILED
+test test_split_during_iteration_attack ... ok
+test test_range_iterator_boundary_attack ... FAILED
+test test_force_linked_list_corruption - should panic ... ok
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_linked_list_cycle_attack ... ok
+test test_concurrent_iteration_modification_attack ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+
+failures:
+
+---- test_iterator_state_corruption_attack stdout ----
+
+thread 'test_iterator_state_corruption_attack' panicked at tests/adversarial_linked_list.rs:286:9:
+ATTACK SUCCESSFUL: Full iterator wrong length: 0
+
+---- test_range_iterator_boundary_attack stdout ----
+
+thread 'test_range_iterator_boundary_attack' panicked at tests/adversarial_linked_list.rs:158:9:
+ATTACK SUCCESSFUL: Range query returned wrong items: []
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_concurrent_iteration_modification_attack stdout ----
+
+thread 'test_concurrent_iteration_modification_attack' panicked at tests/adversarial_linked_list.rs:92:9:
+ATTACK SUCCESSFUL: Iterator skipped items! Expected 50, got 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+
+failures:
+    test_concurrent_iteration_modification_attack
+    test_iterator_state_corruption_attack
+    test_range_iterator_boundary_attack
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 4 passed; 7 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 81 tests
+test test_alternating_insert_delete ... ok
+test test_batch_insert ... FAILED
+test test_arena_consistency ... ok
+test test_capacity_boundary_conditions ... ok
+test test_branch_node_split_creates_new_level ... FAILED
+test test_clustered_key_patterns ... ok
+test test_comprehensive_insert_scenarios ... FAILED
+test test_branch_node_splitting ... FAILED
+test test_clear_and_reuse ... FAILED
+test test_create_empty_tree ... ok
+test test_contains_key ... FAILED
+test test_delete_all_but_one ... FAILED
+test test_deep_tree_insertion ... FAILED
+test test_delete_from_minimal_tree ... FAILED
+test test_delete_from_deep_tree ... FAILED
+test test_delete_until_empty ... FAILED
+test test_extreme_capacity_values ... ok
+test test_duplicate_key_handling ... FAILED
+test test_first_and_last ... FAILED
+test test_get_many ... FAILED
+test test_get_mut ... FAILED
+test test_get_with_default ... FAILED
+test test_insert_and_get_single_item ... FAILED
+test test_insert_multiple_items ... FAILED
+test test_insert_overwrite_value ... FAILED
+test test_insert_through_branch_node ... FAILED
+test test_interleaved_operations ... ok
+test test_invalid_capacity_error ... ok
+test test_invariants_after_many_operations ... ok
+test test_invariants_after_split ... ok
+test test_invariants_empty_tree ... ok
+test test_invariants_single_item ... ok
+test test_iterate_empty_tree ... ok
+test test_iterate_empty_range ... ok
+test test_iterate_from_key ... FAILED
+test test_iterate_from_nonexistent_key ... FAILED
+test test_iterate_multiple_items_single_leaf ... FAILED
+test test_iterate_multiple_leaves ... FAILED
+test test_iterate_range ... FAILED
+test test_iterate_single_item ... FAILED
+test test_iterate_until_key ... FAILED
+test test_key_error_on_missing_key ... FAILED
+test test_keys_iterator ... FAILED
+test test_large_capacity_edge_cases ... ok
+test test_large_sequential_insertion ... FAILED
+test test_leaf_allocation ... FAILED
+test test_leaf_linked_list ... FAILED
+test test_leaf_linked_list_completeness ... ok
+test test_leaf_split_updates_parent_branch ... FAILED
+test test_many_insertions_maintain_invariants ... FAILED
+test test_node_ref_id_and_is_leaf ... ok
+test test_massive_insertion_deletion_cycle ... FAILED
+test test_multi_level_splits ... FAILED
+test test_pathological_deletion_patterns ... ok
+test test_parent_splitting ... FAILED
+test test_overflow ... FAILED
+test test_random_deletion_pattern ... FAILED
+test test_range_query_edge_cases ... FAILED
+test test_range_syntax_support ... FAILED
+test test_range_syntax_with_excluded_bounds ... FAILED
+test test_remove_from_tree_with_branch_root ... FAILED
+test test_remove_multiple_from_tree_with_branches ... FAILED
+test test_remove_multiple_items_from_leaf_root ... FAILED
+test test_remove_nonexistent_key_raises_error ... FAILED
+test test_remove_single_item_from_leaf_root ... FAILED
+test test_remove_nonexistent_key_returns_none ... FAILED
+test test_reverse_order_insertion ... FAILED
+test test_root_collapse ... FAILED
+test test_sequential_vs_random_patterns ... ok
+test test_single_key_operations ... FAILED
+test test_root_promotion_leaf_to_branch ... FAILED
+test test_split_then_add ... FAILED
+test test_stress_deletion_with_invariants ... ok
+test test_try_insert_and_remove ... FAILED
+test test_update_existing_key ... FAILED
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+test test_validate_for_operation ... ok
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_values_iterator ... FAILED
+
+failures:
+
+---- test_batch_insert stdout ----
+
+thread 'test_batch_insert' panicked at tests/bplus_tree.rs:2249:5:
+assertion `left == right` failed
+  left: 0
+ right: 3
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_branch_node_split_creates_new_level stdout ----
+
+thread 'test_branch_node_split_creates_new_level' panicked at tests/bplus_tree.rs:655:5:
+Should have more leaf nodes after inserting 25 items. Initial: 1, Final: 1
+
+---- test_comprehensive_insert_scenarios stdout ----
+Testing comprehensive insert scenarios with capacity 4
+
+thread 'test_comprehensive_insert_scenarios' panicked at tests/bplus_tree.rs:744:13:
+assertion `left == right` failed: Sequential item 1 not found with capacity 4
+  left: None
+ right: Some("seq_value_1")
+
+---- test_branch_node_splitting stdout ----
+
+thread 'test_branch_node_splitting' panicked at tests/bplus_tree.rs:1496:5:
+assertion failed: !tree.is_leaf_root()
+
+---- test_clear_and_reuse stdout ----
+
+thread 'test_clear_and_reuse' panicked at tests/bplus_tree.rs:2034:5:
+assertion `left == right` failed
+  left: 0
+ right: 50
+
+---- test_contains_key stdout ----
+
+thread 'test_contains_key' panicked at tests/bplus_tree.rs:93:5:
+assertion failed: tree.contains_key(&1)
+
+---- test_delete_all_but_one stdout ----
+
+thread 'test_delete_all_but_one' panicked at tests/bplus_tree.rs:1726:5:
+assertion `left == right` failed
+  left: 0
+ right: 1
+
+---- test_deep_tree_insertion stdout ----
+
+thread 'test_deep_tree_insertion' panicked at tests/bplus_tree.rs:1473:9:
+assertion `left == right` failed
+  left: None
+ right: Some("value_0")
+
+---- test_delete_from_minimal_tree stdout ----
+
+thread 'test_delete_from_minimal_tree' panicked at tests/bplus_tree.rs:1817:5:
+assertion failed: !tree.is_leaf_root()
+
+---- test_delete_from_deep_tree stdout ----
+
+thread 'test_delete_from_deep_tree' panicked at tests/bplus_tree.rs:1677:5:
+assertion failed: !tree.is_leaf_root()
+
+---- test_delete_until_empty stdout ----
+
+thread 'test_delete_until_empty' panicked at tests/bplus_tree.rs:1598:5:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_duplicate_key_handling stdout ----
+
+thread 'test_duplicate_key_handling' panicked at tests/bplus_tree.rs:1893:5:
+assertion `left == right` failed
+  left: None
+ right: Some("first")
+
+---- test_first_and_last stdout ----
+
+thread 'test_first_and_last' panicked at tests/bplus_tree.rs:2152:5:
+assertion `left == right` failed
+  left: None
+ right: Some((10, "ten"))
+
+---- test_get_many stdout ----
+
+thread 'test_get_many' panicked at tests/bplus_tree.rs:2270:5:
+assertion `left == right` failed
+  left: []
+ right: ["one", "three"]
+
+---- test_get_mut stdout ----
+
+thread 'test_get_mut' panicked at tests/bplus_tree.rs:2172:5:
+assertion `left == right` failed
+  left: None
+ right: Some("ONE")
+
+---- test_get_with_default stdout ----
+
+thread 'test_get_with_default' panicked at tests/bplus_tree.rs:104:5:
+assertion `left == right` failed
+  left: None
+ right: Some("one")
+
+---- test_insert_and_get_single_item stdout ----
+
+thread 'test_insert_and_get_single_item' panicked at tests/bplus_tree.rs:55:5:
+assertion `left == right` failed
+  left: 0
+ right: 1
+
+---- test_insert_multiple_items stdout ----
+
+thread 'test_insert_multiple_items' panicked at tests/bplus_tree.rs:68:5:
+assertion `left == right` failed
+  left: 0
+ right: 3
+
+---- test_insert_overwrite_value stdout ----
+
+thread 'test_insert_overwrite_value' panicked at tests/bplus_tree.rs:32:5:
+assertion `left == right` failed
+  left: None
+ right: Some("one")
+
+---- test_insert_through_branch_node stdout ----
+
+thread 'test_insert_through_branch_node' panicked at tests/bplus_tree.rs:431:5:
+Tree should have a branch root after inserting 5 items
+
+---- test_iterate_from_key stdout ----
+
+thread 'test_iterate_from_key' panicked at tests/bplus_tree.rs:1207:5:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_iterate_from_nonexistent_key stdout ----
+
+thread 'test_iterate_from_nonexistent_key' panicked at tests/bplus_tree.rs:1259:5:
+assertion `left == right` failed
+  left: 0
+ right: 3
+
+---- test_iterate_multiple_items_single_leaf stdout ----
+
+thread 'test_iterate_multiple_items_single_leaf' panicked at tests/bplus_tree.rs:1140:5:
+assertion `left == right` failed
+  left: []
+ right: [(1, "value1"), (2, "value2"), (3, "value3"), (4, "value4")]
+
+---- test_iterate_multiple_leaves stdout ----
+
+thread 'test_iterate_multiple_leaves' panicked at tests/bplus_tree.rs:1161:5:
+assertion `left == right` failed
+  left: 0
+ right: 9
+
+---- test_iterate_range stdout ----
+
+thread 'test_iterate_range' panicked at tests/bplus_tree.rs:1241:5:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+---- test_iterate_single_item stdout ----
+
+thread 'test_iterate_single_item' panicked at tests/bplus_tree.rs:1128:5:
+assertion `left == right` failed
+  left: []
+ right: [(5, "value5")]
+
+---- test_iterate_until_key stdout ----
+
+thread 'test_iterate_until_key' panicked at tests/bplus_tree.rs:1224:5:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_key_error_on_missing_key stdout ----
+
+thread 'test_key_error_on_missing_key' panicked at tests/bplus_tree.rs:1092:5:
+assertion `left == right` failed
+  left: Err(KeyNotFound)
+ right: Ok("one")
+
+---- test_keys_iterator stdout ----
+
+thread 'test_keys_iterator' panicked at tests/bplus_tree.rs:1178:5:
+assertion `left == right` failed
+  left: []
+ right: [1, 2, 3]
+
+---- test_large_sequential_insertion stdout ----
+
+thread 'test_large_sequential_insertion' panicked at tests/bplus_tree.rs:1551:5:
+assertion `left == right` failed
+  left: 0
+ right: 1000
+
+---- test_leaf_allocation stdout ----
+
+thread 'test_leaf_allocation' panicked at tests/bplus_tree.rs:868:5:
+assertion `left == right` failed: First allocation should get ID 1
+  left: 0
+ right: 1
+
+---- test_leaf_linked_list stdout ----
+
+thread 'test_leaf_linked_list' panicked at tests/bplus_tree.rs:969:5:
+assertion `left == right` failed: id1 should point to id2
+  left: None
+ right: Some(0)
+
+---- test_leaf_split_updates_parent_branch stdout ----
+
+thread 'test_leaf_split_updates_parent_branch' panicked at tests/bplus_tree.rs:484:5:
+Tree should have a branch root
+
+---- test_many_insertions_maintain_invariants stdout ----
+
+thread 'test_many_insertions_maintain_invariants' panicked at tests/bplus_tree.rs:180:9:
+assertion `left == right` failed
+  left: None
+ right: Some("value_0")
+
+---- test_massive_insertion_deletion_cycle stdout ----
+
+thread 'test_massive_insertion_deletion_cycle' panicked at tests/bplus_tree.rs:1768:13:
+assertion `left == right` failed
+  left: None
+ right: Some("value_1")
+
+---- test_multi_level_splits stdout ----
+
+thread 'test_multi_level_splits' panicked at tests/bplus_tree.rs:1524:5:
+assertion `left == right` failed
+  left: 0
+ right: 200
+
+---- test_parent_splitting stdout ----
+
+thread 'test_parent_splitting' panicked at tests/bplus_tree.rs:196:9:
+assertion `left == right` failed
+  left: None
+ right: Some("value_0")
+
+---- test_overflow stdout ----
+
+thread 'test_overflow' panicked at tests/bplus_tree.rs:128:5:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_random_deletion_pattern stdout ----
+
+thread 'test_random_deletion_pattern' panicked at tests/bplus_tree.rs:1804:13:
+assertion `left == right` failed
+  left: None
+ right: Some(0)
+
+---- test_range_query_edge_cases stdout ----
+
+thread 'test_range_query_edge_cases' panicked at tests/bplus_tree.rs:2060:5:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_range_syntax_support stdout ----
+
+thread 'test_range_syntax_support' panicked at tests/bplus_tree.rs:2084:5:
+assertion `left == right` failed
+  left: []
+ right: [(3, "value3"), (4, "value4"), (5, "value5"), (6, "value6")]
+
+---- test_range_syntax_with_excluded_bounds stdout ----
+
+thread 'test_range_syntax_with_excluded_bounds' panicked at tests/bplus_tree.rs:2128:5:
+assertion `left == right` failed
+  left: []
+ right: [4, 5, 6, 7]
+
+---- test_remove_from_tree_with_branch_root stdout ----
+
+thread 'test_remove_from_tree_with_branch_root' panicked at tests/bplus_tree.rs:298:5:
+assertion failed: !tree.is_leaf_root()
+
+---- test_remove_multiple_from_tree_with_branches stdout ----
+
+thread 'test_remove_multiple_from_tree_with_branches' panicked at tests/bplus_tree.rs:330:5:
+assertion `left == right` failed
+  left: None
+ right: Some("value_3")
+
+---- test_remove_multiple_items_from_leaf_root stdout ----
+
+thread 'test_remove_multiple_items_from_leaf_root' panicked at tests/bplus_tree.rs:238:5:
+assertion `left == right` failed
+  left: None
+ right: Some("two")
+
+---- test_remove_nonexistent_key_raises_error stdout ----
+
+thread 'test_remove_nonexistent_key_raises_error' panicked at tests/bplus_tree.rs:1106:5:
+assertion `left == right` failed
+  left: 0
+ right: 2
+
+---- test_remove_single_item_from_leaf_root stdout ----
+
+thread 'test_remove_single_item_from_leaf_root' panicked at tests/bplus_tree.rs:218:5:
+assertion `left == right` failed
+  left: None
+ right: Some("one")
+
+---- test_remove_nonexistent_key_returns_none stdout ----
+
+thread 'test_remove_nonexistent_key_returns_none' panicked at tests/bplus_tree.rs:280:5:
+assertion `left == right` failed
+  left: 0
+ right: 2
+
+---- test_reverse_order_insertion stdout ----
+
+thread 'test_reverse_order_insertion' panicked at tests/bplus_tree.rs:1577:5:
+assertion `left == right` failed
+  left: 0
+ right: 100
+
+---- test_root_collapse stdout ----
+
+thread 'test_root_collapse' panicked at tests/bplus_tree.rs:1629:5:
+assertion failed: !tree.is_leaf_root()
+
+---- test_single_key_operations stdout ----
+
+thread 'test_single_key_operations' panicked at tests/bplus_tree.rs:1869:5:
+assertion `left == right` failed
+  left: 0
+ right: 1
+
+---- test_root_promotion_leaf_to_branch stdout ----
+
+thread 'test_root_promotion_leaf_to_branch' panicked at tests/bplus_tree.rs:576:5:
+Tree should have branch root after exceeding leaf capacity
+
+---- test_split_then_add stdout ----
+
+thread 'test_split_then_add' panicked at tests/bplus_tree.rs:153:5:
+assertion `left == right` failed
+  left: 0
+ right: 8
+
+---- test_try_insert_and_remove stdout ----
+
+thread 'test_try_insert_and_remove' panicked at tests/bplus_tree.rs:2231:5:
+assertion `left == right` failed
+  left: None
+ right: Some("one")
+
+---- test_update_existing_key stdout ----
+
+thread 'test_update_existing_key' panicked at tests/bplus_tree.rs:81:5:
+assertion `left == right` failed
+  left: 0
+ right: 1
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_values_iterator stdout ----
+
+thread 'test_values_iterator' panicked at tests/bplus_tree.rs:1189:5:
+assertion `left == right` failed
+  left: []
+ right: ["one", "two", "three"]
+
+
+failures:
+    test_batch_insert
+    test_branch_node_split_creates_new_level
+    test_branch_node_splitting
+    test_clear_and_reuse
+    test_comprehensive_insert_scenarios
+    test_contains_key
+    test_deep_tree_insertion
+    test_delete_all_but_one
+    test_delete_from_deep_tree
+    test_delete_from_minimal_tree
+    test_delete_until_empty
+    test_duplicate_key_handling
+    test_first_and_last
+    test_get_many
+    test_get_mut
+    test_get_with_default
+    test_insert_and_get_single_item
+    test_insert_multiple_items
+    test_insert_overwrite_value
+    test_insert_through_branch_node
+    test_iterate_from_key
+    test_iterate_from_nonexistent_key
+    test_iterate_multiple_items_single_leaf
+    test_iterate_multiple_leaves
+    test_iterate_range
+    test_iterate_single_item
+    test_iterate_until_key
+    test_key_error_on_missing_key
+    test_keys_iterator
+    test_large_sequential_insertion
+    test_leaf_allocation
+    test_leaf_linked_list
+    test_leaf_split_updates_parent_branch
+    test_many_insertions_maintain_invariants
+    test_massive_insertion_deletion_cycle
+    test_multi_level_splits
+    test_overflow
+    test_parent_splitting
+    test_random_deletion_pattern
+    test_range_query_edge_cases
+    test_range_syntax_support
+    test_range_syntax_with_excluded_bounds
+    test_remove_from_tree_with_branch_root
+    test_remove_multiple_from_tree_with_branches
+    test_remove_multiple_items_from_leaf_root
+    test_remove_nonexistent_key_raises_error
+    test_remove_nonexistent_key_returns_none
+    test_remove_single_item_from_leaf_root
+    test_reverse_order_insertion
+    test_root_collapse
+    test_root_promotion_leaf_to_branch
+    test_single_key_operations
+    test_split_then_add
+    test_try_insert_and_remove
+    test_update_existing_key
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+    test_values_iterator
+
+test result: FAILED. 21 passed; 60 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 16 tests
+test test_arena_id_collision - should panic ... FAILED
+test test_incomplete_rebalancing_logic ... ok
+test test_incorrect_split_logic_odd_capacity ... ok
+test test_memory_leak_in_root_creation ... ok
+test test_split_validation_missing ... ok
+test test_range_iterator_bound_handling ... FAILED
+test test_root_collapse_edge_cases ... FAILED
+test test_arena_tree_consistency ... FAILED
+test test_linked_list_corruption_during_merge ... FAILED
+test test_iterator_lifetime_safety ... FAILED
+test test_min_keys_calculation_inconsistency - should panic ... ok
+test test_root_split_linked_list_race ... FAILED
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+
+failures:
+
+---- test_arena_id_collision stdout ----
+note: test did not panic as expected
+---- test_range_iterator_bound_handling stdout ----
+
+thread 'test_range_iterator_bound_handling' panicked at tests/bug_reproduction_tests.rs:124:9:
+Range iterator bound error: item 4 should be included after excluded 3
+
+---- test_root_collapse_edge_cases stdout ----
+
+thread 'test_root_collapse_edge_cases' panicked at tests/bug_reproduction_tests.rs:251:9:
+Root collapse cascade error: expected 5 items, got 0
+
+---- test_arena_tree_consistency stdout ----
+
+thread 'test_arena_tree_consistency' panicked at tests/bug_reproduction_tests.rs:213:9:
+Arena-tree consistency violation: 0 allocated but 1 in tree
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_linked_list_corruption_during_merge stdout ----
+
+thread 'test_linked_list_corruption_during_merge' panicked at tests/bug_reproduction_tests.rs:61:9:
+Linked list corruption: expected [0, 10, 20, 30, 40, 150, 160, 170, 180, 190], got []
+
+---- test_iterator_lifetime_safety stdout ----
+
+thread 'test_iterator_lifetime_safety' panicked at tests/bug_reproduction_tests.rs:229:5:
+assertion `left == right` failed
+  left: 0
+ right: 4
+
+---- test_root_split_linked_list_race stdout ----
+
+thread 'test_root_split_linked_list_race' panicked at tests/bug_reproduction_tests.rs:99:9:
+Root split linked list race: iteration broken after root split
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+
+failures:
+    test_arena_id_collision
+    test_arena_tree_consistency
+    test_iterator_lifetime_safety
+    test_linked_list_corruption_during_merge
+    test_range_iterator_bound_handling
+    test_root_collapse_edge_cases
+    test_root_split_linked_list_race
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 5 passed; 11 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 8 tests
+test stress_test_arena_consistency ... ok
+test test_invariants_after_problematic_operations ... ok
+test test_utils::tests::test_attack_patterns ... FAILED
+test demonstrate_memory_leak_accumulation ... FAILED
+test test_linked_list_corruption_causes_data_loss ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+
+failures:
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- demonstrate_memory_leak_accumulation stdout ----
+
+=== DEMONSTRATING MEMORY LEAK ACCUMULATION ===
+
+thread 'demonstrate_memory_leak_accumulation' panicked at tests/critical_bug_test.rs:81:22:
+attempt to subtract with overflow
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_linked_list_corruption_causes_data_loss stdout ----
+Initial tree state:
+Leaf count: 1
+Items: []
+After deletions:
+Items: []
+
+thread 'test_linked_list_corruption_causes_data_loss' panicked at tests/critical_bug_test.rs:49:13:
+Key 10 became unreachable
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+
+failures:
+    demonstrate_memory_leak_accumulation
+    test_linked_list_corruption_causes_data_loss
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 2 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 9 tests
+test test_empty_tree_leaf_count ... ok
+test test_single_insertion ... ok
+test test_tree_creation_only ... ok
+test test_split_balance ... FAILED
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+test test_leaf_sizes ... FAILED
+
+failures:
+
+---- test_split_balance stdout ----
+Testing split balance with capacity 5...
+Leaf sizes after 20 insertions: []
+
+thread 'test_split_balance' panicked at tests/debug_infinite_loop.rs:65:40:
+called `Option::unwrap()` on a `None` value
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+---- test_leaf_sizes stdout ----
+Creating tree...
+Getting leaf sizes...
+Leaf sizes: []
+
+thread 'test_leaf_sizes' panicked at tests/debug_infinite_loop.rs:35:5:
+assertion `left == right` failed
+  left: []
+ right: [0]
+
+
+failures:
+    test_leaf_sizes
+    test_split_balance
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 3 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 18 tests
+test test_enhanced_error_constructors ... ok
+test test_batch_insert ... FAILED
+test comprehensive_tests::test_comprehensive_error_scenario ... FAILED
+test test_error_context_propagation ... FAILED
+test test_error_recovery_patterns ... ok
+test test_get_many ... FAILED
+test test_error_handling_performance ... ok
+test test_integration_with_existing_api ... FAILED
+test test_get_or_default ... FAILED
+test test_result_type_aliases ... FAILED
+test test_try_get ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_result_extension_trait ... FAILED
+test test_validate_for_operation ... ok
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+test test_try_insert_and_try_remove ... FAILED
+
+failures:
+
+---- test_batch_insert stdout ----
+=== BATCH INSERT TEST ===
+
+thread 'test_batch_insert' panicked at tests/enhanced_error_handling.rs:216:5:
+assertion `left == right` failed
+  left: []
+ right: [None, None, None]
+
+---- comprehensive_tests::test_comprehensive_error_scenario stdout ----
+=== COMPREHENSIVE ERROR SCENARIO TEST ===
+
+thread 'comprehensive_tests::test_comprehensive_error_scenario' panicked at tests/enhanced_error_handling.rs:409:9:
+assertion failed: removed_value.is_ok()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_error_context_propagation stdout ----
+=== ERROR CONTEXT PROPAGATION TEST ===
+
+thread 'test_error_context_propagation' panicked at tests/enhanced_error_handling.rs:284:5:
+assertion failed: error_msg.contains("Key not found")
+
+---- test_get_many stdout ----
+=== GET MANY TEST ===
+
+thread 'test_get_many' panicked at tests/enhanced_error_handling.rs:238:5:
+assertion `left == right` failed
+  left: 0
+ right: 4
+
+---- test_integration_with_existing_api stdout ----
+=== INTEGRATION WITH EXISTING API TEST ===
+
+thread 'test_integration_with_existing_api' panicked at tests/enhanced_error_handling.rs:310:5:
+assertion failed: value.is_ok()
+
+---- test_get_or_default stdout ----
+=== GET OR DEFAULT TEST ===
+
+thread 'test_get_or_default' panicked at tests/enhanced_error_handling.rs:143:5:
+assertion `left == right` failed
+  left: "default"
+ right: "value_2"
+
+---- test_result_type_aliases stdout ----
+=== RESULT TYPE ALIASES TEST ===
+
+thread 'test_result_type_aliases' panicked at tests/enhanced_error_handling.rs:77:5:
+assertion failed: key_result.is_ok()
+
+---- test_try_get stdout ----
+=== TRY GET TEST ===
+
+thread 'test_try_get' panicked at tests/enhanced_error_handling.rs:160:5:
+assertion failed: result.is_ok()
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_result_extension_trait stdout ----
+=== RESULT EXTENSION TRAIT TEST ===
+
+thread 'test_result_extension_trait' panicked at tests/enhanced_error_handling.rs:108:5:
+assertion failed: with_context.unwrap_err().to_string().contains("Key not found")
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+---- test_try_insert_and_try_remove stdout ----
+=== TRY INSERT AND TRY REMOVE TEST ===
+
+thread 'test_try_insert_and_try_remove' panicked at tests/enhanced_error_handling.rs:185:5:
+assertion `left == right` failed
+  left: None
+ right: Some("value_1")
+
+
+failures:
+    comprehensive_tests::test_comprehensive_error_scenario
+    test_batch_insert
+    test_error_context_propagation
+    test_get_many
+    test_get_or_default
+    test_integration_with_existing_api
+    test_result_extension_trait
+    test_result_type_aliases
+    test_try_get
+    test_try_insert_and_try_remove
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 4 passed; 14 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 11 tests
+test test_edge_case_error_handling ... ok
+test test_error_message_formatting ... ok
+test test_error_recovery ... FAILED
+test test_error_propagation ... FAILED
+test test_operation_safety ... FAILED
+test test_public_api_error_consistency ... ok
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_internal_error_consistency ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+
+failures:
+
+---- test_error_recovery stdout ----
+=== ERROR RECOVERY TEST ===
+
+thread 'test_error_recovery' panicked at tests/error_handling_consistency.rs:290:5:
+assertion `left == right` failed: Tree should have 10 items after recovery
+  left: 0
+ right: 10
+
+---- test_error_propagation stdout ----
+=== ERROR PROPAGATION TEST ===
+
+thread 'test_error_propagation' panicked at tests/error_handling_consistency.rs:161:5:
+assertion `left == right` failed: Range should return correct count
+  left: 0
+ right: 10
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_operation_safety stdout ----
+=== OPERATION SAFETY TEST ===
+
+thread 'test_operation_safety' panicked at tests/error_handling_consistency.rs:206:13:
+Key should exist after insertion
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_internal_error_consistency stdout ----
+=== INTERNAL ERROR CONSISTENCY TEST ===
+
+thread 'test_internal_error_consistency' panicked at tests/error_handling_consistency.rs:350:5:
+assertion `left == right` failed: Should have correct number of remaining items
+  left: 0
+ right: 400
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+
+failures:
+    test_error_propagation
+    test_error_recovery
+    test_internal_error_consistency
+    test_operation_safety
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 3 passed; 8 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 4 tests
+test fuzz_test_bplustree ... ignored
+test fuzz_test_timed ... ignored
+test fuzz_test_with_random_keys ... ignored
+test fuzz_test_with_updates ... ignored
+
+test result: ok. 0 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 8 tests
+test test_linked_list_stress_consistency ... ok
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_linked_list_edge_cases ... FAILED
+test test_merge_scenarios_linked_list_integrity ... FAILED
+test test_intensive_linked_list_corruption_detection ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+
+failures:
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_linked_list_edge_cases stdout ----
+=== LINKED LIST EDGE CASES TEST ===
+
+thread 'test_linked_list_edge_cases' panicked at tests/linked_list_corruption_detection.rs:236:9:
+assertion `left == right` failed: Single leaf case failed
+  left: []
+ right: [1]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_merge_scenarios_linked_list_integrity stdout ----
+=== MERGE SCENARIOS LINKED LIST INTEGRITY TEST ===
+
+--- Test 1: Left merge scenario ---
+Before deletions: []
+After deletions: []
+
+thread 'test_merge_scenarios_linked_list_integrity' panicked at tests/linked_list_corruption_detection.rs:159:13:
+Left merge integrity error: expected [0, 1, 2, 3, 8, 9, 10, 11, 12, 13, 14, 15], got []
+
+---- test_intensive_linked_list_corruption_detection stdout ----
+=== INTENSIVE LINKED LIST INTEGRITY VERIFICATION ===
+
+--- Phase 1: Building complex tree structure ---
+Initial tree items: []
+Initial leaf count: 1
+
+--- Phase 2: Strategic deletions to trigger merges ---
+Removing key: 20
+  Items after removal: []
+
+thread 'test_intensive_linked_list_corruption_detection' panicked at tests/linked_list_corruption_detection.rs:61:21:
+INTEGRITY ERROR: Key 0 should exist but is not accessible
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+
+failures:
+    test_intensive_linked_list_corruption_detection
+    test_linked_list_edge_cases
+    test_merge_scenarios_linked_list_integrity
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 1 passed; 7 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 9 tests
+test test_memory_leak_regression_prevention ... ok
+test test_root_split_no_memory_accumulation ... ok
+test test_arena_fragmentation_and_reuse ... FAILED
+test test_stress_allocation_deallocation_cycles ... ok
+test test_edge_case_memory_scenarios ... FAILED
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+
+failures:
+
+---- test_arena_fragmentation_and_reuse stdout ----
+=== ARENA FRAGMENTATION AND REUSE TEST ===
+
+--- Fragmentation Phase 1 ---
+  Allocated: 0 -> 0
+  Free: 0 -> 0
+  ✅ Free list grew as expected
+
+--- Fragmentation Phase 2 ---
+  Allocated: 0 -> 0
+  Free: 0 -> 0
+  ✅ Free list grew as expected
+
+--- Fragmentation Phase 3 ---
+  Allocated: 0 -> 0
+  Free: 0 -> 0
+  ✅ Free list grew as expected
+
+--- Fragmentation Phase 4 ---
+  Allocated: 0 -> 0
+  Free: 0 -> 0
+  ✅ Free list grew as expected
+
+--- Fragmentation Phase 5 ---
+  Allocated: 0 -> 0
+  Free: 0 -> 0
+  ✅ Free list grew as expected
+
+thread 'test_arena_fragmentation_and_reuse' panicked at tests/memory_leak_detection.rs:235:9:
+Final fragmentation test failed: 0 allocated vs 1 in tree
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_edge_case_memory_scenarios stdout ----
+=== EDGE CASE MEMORY SCENARIOS ===
+
+thread 'test_edge_case_memory_scenarios' panicked at tests/memory_leak_detection.rs:297:9:
+assertion `left == right` failed: Single node leak
+  left: 0
+ right: 1
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+
+failures:
+    test_arena_fragmentation_and_reuse
+    test_edge_case_memory_scenarios
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 3 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 10 tests
+test test_arena_iteration_type_safety ... FAILED
+test test_arena_operations_bounds ... FAILED
+test test_integer_overflow_prevention ... FAILED
+test test_arena_bounds_checking ... FAILED
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+test test_node_id_capacity_limits ... FAILED
+test test_memory_safety_stress ... ok
+
+failures:
+
+---- test_arena_iteration_type_safety stdout ----
+=== ARENA ITERATION TYPE SAFETY TEST ===
+Iteration collected 0 items
+
+thread 'test_arena_iteration_type_safety' panicked at tests/memory_safety_audit.rs:110:5:
+assertion `left == right` failed: Should have 900 items after removals
+  left: 0
+ right: 900
+
+---- test_arena_operations_bounds stdout ----
+=== ARENA OPERATIONS BOUNDS TEST ===
+Inserted keys: [0, 1000, 10000, 100000, 1000000]
+
+thread 'test_arena_operations_bounds' panicked at tests/memory_safety_audit.rs:233:9:
+Key 0 should be accessible
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_integer_overflow_prevention stdout ----
+=== INTEGER OVERFLOW PREVENTION TEST ===
+Successfully inserted large numbers
+
+thread 'test_integer_overflow_prevention' panicked at tests/memory_safety_audit.rs:147:9:
+Large number 2147482647 should be accessible
+
+---- test_arena_bounds_checking stdout ----
+=== ARENA BOUNDS CHECKING TEST ===
+Successfully inserted 10,000 items
+Allocated leaves: 0
+Allocated branches: 0
+
+thread 'test_arena_bounds_checking' panicked at tests/memory_safety_audit.rs:29:9:
+Key 0 should be accessible
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+---- test_node_id_capacity_limits stdout ----
+=== NODE ID CAPACITY LIMITS TEST ===
+  10000 items: 0 allocated, 1 in tree
+
+thread 'test_node_id_capacity_limits' panicked at tests/memory_safety_audit.rs:77:13:
+Allocation count should be positive
+
+
+failures:
+    test_arena_bounds_checking
+    test_arena_iteration_type_safety
+    test_arena_operations_bounds
+    test_integer_overflow_prevention
+    test_node_id_capacity_limits
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 1 passed; 9 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 11 tests
+test test_range_syntax_excluded_start ... FAILED
+test test_range_syntax_inclusive ... FAILED
+test test_range_syntax_empty_ranges ... ok
+test test_range_syntax_from ... FAILED
+test test_range_syntax_full ... FAILED
+test test_range_syntax_to_inclusive ... FAILED
+test test_range_syntax_edge_cases ... FAILED
+test test_range_syntax_with_strings ... FAILED
+test test_range_syntax_exclusive ... FAILED
+test test_range_syntax_to ... FAILED
+test test_range_syntax_single_element ... FAILED
+
+failures:
+
+---- test_range_syntax_excluded_start stdout ----
+
+thread 'test_range_syntax_excluded_start' panicked at tests/range_bounds_syntax.rs:198:5:
+assertion `left == right` failed
+  left: []
+ right: [4, 5, 6]
+
+---- test_range_syntax_inclusive stdout ----
+
+thread 'test_range_syntax_inclusive' panicked at tests/range_bounds_syntax.rs:12:5:
+assertion `left == right` failed
+  left: []
+ right: [(3, "value3"), (4, "value4"), (5, "value5"), (6, "value6"), (7, "value7")]
+
+---- test_range_syntax_from stdout ----
+
+thread 'test_range_syntax_from' panicked at tests/range_bounds_syntax.rs:53:5:
+assertion `left == right` failed
+  left: []
+ right: [5, 6, 7, 8, 9]
+
+---- test_range_syntax_full stdout ----
+
+thread 'test_range_syntax_full' panicked at tests/range_bounds_syntax.rs:89:5:
+assertion `left == right` failed
+  left: []
+ right: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+---- test_range_syntax_to_inclusive stdout ----
+
+thread 'test_range_syntax_to_inclusive' panicked at tests/range_bounds_syntax.rs:77:5:
+assertion `left == right` failed
+  left: []
+ right: [0, 1, 2, 3, 4, 5]
+
+---- test_range_syntax_edge_cases stdout ----
+
+thread 'test_range_syntax_edge_cases' panicked at tests/range_bounds_syntax.rs:121:5:
+assertion `left == right` failed
+  left: []
+ right: [4, 6]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_range_syntax_with_strings stdout ----
+
+thread 'test_range_syntax_with_strings' panicked at tests/range_bounds_syntax.rs:145:5:
+assertion `left == right` failed
+  left: []
+ right: ["banana", "cherry", "date"]
+
+---- test_range_syntax_exclusive stdout ----
+
+thread 'test_range_syntax_exclusive' panicked at tests/range_bounds_syntax.rs:33:5:
+assertion `left == right` failed
+  left: []
+ right: [(3, "value3"), (4, "value4"), (5, "value5"), (6, "value6")]
+
+---- test_range_syntax_to stdout ----
+
+thread 'test_range_syntax_to' panicked at tests/range_bounds_syntax.rs:65:5:
+assertion `left == right` failed
+  left: []
+ right: [0, 1, 2, 3, 4]
+
+---- test_range_syntax_single_element stdout ----
+
+thread 'test_range_syntax_single_element' panicked at tests/range_bounds_syntax.rs:164:5:
+assertion `left == right` failed
+  left: []
+ right: [5]
+
+
+failures:
+    test_range_syntax_edge_cases
+    test_range_syntax_excluded_start
+    test_range_syntax_exclusive
+    test_range_syntax_from
+    test_range_syntax_full
+    test_range_syntax_inclusive
+    test_range_syntax_single_element
+    test_range_syntax_to
+    test_range_syntax_to_inclusive
+    test_range_syntax_with_strings
+
+test result: FAILED. 1 passed; 10 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 2 tests
+test test_range_differential_basic_boundaries ... FAILED
+test test_range_differential_gaps_and_nonexistent_bounds ... FAILED
+
+failures:
+
+---- test_range_differential_basic_boundaries stdout ----
+
+thread 'test_range_differential_basic_boundaries' panicked at tests/range_differential.rs:23:13:
+assertion `left == right` failed: mismatch for range: 3..7 (cap=4)
+  left: []
+ right: [(3, 30), (4, 40), (5, 50), (6, 60)]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_range_differential_gaps_and_nonexistent_bounds stdout ----
+
+thread 'test_range_differential_gaps_and_nonexistent_bounds' panicked at tests/range_differential.rs:71:13:
+assertion `left == right` failed: mismatch for range: 3..9 (cap=4)
+  left: []
+ right: [(4, 40), (7, 70), (8, 80)]
+
+
+failures:
+    test_range_differential_basic_boundaries
+    test_range_differential_gaps_and_nonexistent_bounds
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 17 tests
+test test_bplustree_remove_from_first_node_causing_empty ... FAILED
+test test_bplustree_remove_all_keys_from_single_node ... FAILED
+test test_bplustree_remove_with_root_node_empty_validation ... FAILED
+test test_bplustree_remove_with_underflow ... FAILED
+test test_bplustree_remove_last_key_from_tree ... FAILED
+test test_demonstrates_need_for_borrowing_and_merging ... FAILED
+test test_remove_nonexistent_key ... FAILED
+test test_strict_invariant_checking_should_fail - should panic ... ok
+test test_underfull_child_rebalancing_path ... FAILED
+test test_underfull_nodes_violate_invariants - should panic ... FAILED
+test test_underfull_leaf_detection ... FAILED
+test test_underfull_without_root_collapse ... FAILED
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_bplustree_remove_existing_key ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+
+failures:
+
+---- test_bplustree_remove_from_first_node_causing_empty stdout ----
+
+thread 'test_bplustree_remove_from_first_node_causing_empty' panicked at tests/remove_operations.rs:444:5:
+Should have multiple nodes
+
+---- test_bplustree_remove_all_keys_from_single_node stdout ----
+
+thread 'test_bplustree_remove_all_keys_from_single_node' panicked at tests/remove_operations.rs:404:5:
+assertion `left == right` failed
+  left: 0
+ right: 3
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_bplustree_remove_with_root_node_empty_validation stdout ----
+
+thread 'test_bplustree_remove_with_root_node_empty_validation' panicked at tests/remove_operations.rs:480:5:
+assertion `left == right` failed
+  left: None
+ right: Some(1000)
+
+---- test_bplustree_remove_with_underflow stdout ----
+
+thread 'test_bplustree_remove_with_underflow' panicked at tests/remove_operations.rs:339:5:
+Should have multiple nodes
+
+---- test_bplustree_remove_last_key_from_tree stdout ----
+
+thread 'test_bplustree_remove_last_key_from_tree' panicked at tests/remove_operations.rs:372:5:
+assertion `left == right` failed
+  left: None
+ right: Some(420)
+
+---- test_demonstrates_need_for_borrowing_and_merging stdout ----
+Tree before creating underfull condition:
+Leaf sizes: []
+
+Tree after creating underfull condition:
+Leaf sizes: []
+
+thread 'test_demonstrates_need_for_borrowing_and_merging' panicked at tests/remove_operations.rs:233:5:
+assertion `left == right` failed
+  left: None
+ right: Some(30)
+
+---- test_remove_nonexistent_key stdout ----
+
+thread 'test_remove_nonexistent_key' panicked at tests/remove_operations.rs:495:5:
+assertion `left == right` failed
+  left: 0
+ right: 3
+
+---- test_underfull_child_rebalancing_path stdout ----
+
+thread 'test_underfull_child_rebalancing_path' panicked at tests/remove_operations.rs:25:5:
+Tree should have branch nodes
+
+---- test_underfull_nodes_violate_invariants stdout ----
+note: test did not panic as expected
+---- test_underfull_leaf_detection stdout ----
+Initial tree:
+Leaf sizes: []
+
+After removing keys to create underfull condition:
+Leaf sizes: []
+
+thread 'test_underfull_leaf_detection' panicked at tests/remove_operations.rs:126:5:
+assertion `left == right` failed
+  left: None
+ right: Some(300)
+
+---- test_underfull_without_root_collapse stdout ----
+Initial large tree:
+Leaf sizes: []
+
+After strategic removals:
+Leaf sizes: []
+
+thread 'test_underfull_without_root_collapse' panicked at tests/remove_operations.rs:176:5:
+assertion `left == right` failed
+  left: None
+ right: Some(10)
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_bplustree_remove_existing_key stdout ----
+
+thread 'test_bplustree_remove_existing_key' panicked at tests/remove_operations.rs:315:5:
+assertion `left == right` failed
+  left: None
+ right: Some(200)
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+
+failures:
+    test_bplustree_remove_all_keys_from_single_node
+    test_bplustree_remove_existing_key
+    test_bplustree_remove_from_first_node_causing_empty
+    test_bplustree_remove_last_key_from_tree
+    test_bplustree_remove_with_root_node_empty_validation
+    test_bplustree_remove_with_underflow
+    test_demonstrates_need_for_borrowing_and_merging
+    test_remove_nonexistent_key
+    test_underfull_child_rebalancing_path
+    test_underfull_leaf_detection
+    test_underfull_nodes_violate_invariants
+    test_underfull_without_root_collapse
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 1 passed; 16 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 12 tests
+test test_iterator_consistency ... ok
+test test_linked_list_integrity ... ok
+test test_min_keys_consistency ... ok
+test test_odd_capacity_split ... ok
+test test_rebalancing_after_deletions ... ok
+test test_arena_utilization ... FAILED
+test test_memory_leak_placeholder ... FAILED
+test test_range_excluded_bounds ... FAILED
+test test_utils::tests::test_attack_patterns ... FAILED
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+
+failures:
+
+---- test_arena_utilization stdout ----
+Initial state:
+  Leaf utilization: 0.00
+  Allocated leaves: 0
+  Free leaves: 0
+After insertions:
+  Leaf utilization: 0.00
+  Allocated leaves: 0
+  Free leaves: 0
+After deletions:
+  Leaf utilization: 0.00
+  Allocated leaves: 0
+  Free leaves: 0
+
+thread 'test_arena_utilization' panicked at tests/simple_bug_tests.rs:237:5:
+Utilization should be between 0 and 1, got 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_memory_leak_placeholder stdout ----
+Allocated leaves: 0, Actual leaves in tree: 1
+
+thread 'test_memory_leak_placeholder' panicked at tests/simple_bug_tests.rs:25:5:
+Should have at least as many allocated as in tree
+
+---- test_range_excluded_bounds stdout ----
+Items with excluded start 3: []
+
+thread 'test_range_excluded_bounds' panicked at tests/simple_bug_tests.rs:123:5:
+Should include 4 after excluding 3
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+
+failures:
+    test_arena_utilization
+    test_memory_leak_placeholder
+    test_range_excluded_bounds
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 5 passed; 7 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 13 tests
+test demonstrate_incorrect_split_for_odd_capacity ... ok
+test demonstrate_arena_tree_consistency_issues ... ok
+test demonstrate_linked_list_merge_corruption ... ok
+test demonstrate_min_keys_inconsistency ... ok
+test demonstrate_range_iterator_excluded_bound_bug ... ok
+test demonstrate_rebalancing_issues ... ok
+test demonstrate_root_collapse_edge_case ... ok
+test test_utils::tests::test_combined_creation_utilities ... FAILED
+test test_utils::tests::test_stress_cycle_utility ... FAILED
+test demonstrate_memory_leak_bug ... FAILED
+test test_utils::tests::test_attack_patterns ... FAILED
+test verify_all_bugs_detected ... ok
+test test_utils::tests::test_utilities_basic_functionality ... FAILED
+
+failures:
+
+---- test_utils::tests::test_combined_creation_utilities stdout ----
+
+thread 'test_utils::tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_stress_cycle_utility stdout ----
+
+thread 'test_utils::tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- demonstrate_memory_leak_bug stdout ----
+
+=== DEMONSTRATING MEMORY LEAK BUG ===
+Initial: 0 allocated leaves
+After insertions:
+  Allocated in arena: 0
+  Actually in tree structure: 1
+
+thread 'demonstrate_memory_leak_bug' panicked at tests/specific_bug_demos.rs:24:36:
+attempt to subtract with overflow
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- test_utils::tests::test_attack_patterns stdout ----
+
+thread 'test_utils::tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- test_utils::tests::test_utilities_basic_functionality stdout ----
+
+thread 'test_utils::tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+
+failures:
+    demonstrate_memory_leak_bug
+    test_utils::tests::test_attack_patterns
+    test_utils::tests::test_combined_creation_utilities
+    test_utils::tests::test_stress_cycle_utility
+    test_utils::tests::test_utilities_basic_functionality
+
+test result: FAILED. 8 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 4 tests
+test tests::test_combined_creation_utilities ... FAILED
+test tests::test_attack_patterns ... FAILED
+test tests::test_stress_cycle_utility ... FAILED
+test tests::test_utilities_basic_functionality ... FAILED
+
+failures:
+
+---- tests::test_combined_creation_utilities stdout ----
+
+thread 'tests::test_combined_creation_utilities' panicked at tests/test_utils.rs:531:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+
+---- tests::test_attack_patterns stdout ----
+
+thread 'tests::test_attack_patterns' panicked at tests/test_utils.rs:541:9:
+assertion `left == right` failed
+  left: 0
+ right: 20
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- tests::test_stress_cycle_utility stdout ----
+
+thread 'tests::test_stress_cycle_utility' panicked at tests/test_utils.rs:525:9:
+assertion `left == right` failed
+  left: 0
+ right: 5
+
+---- tests::test_utilities_basic_functionality stdout ----
+
+thread 'tests::test_utilities_basic_functionality' panicked at tests/test_utils.rs:511:9:
+assertion `left == right` failed
+  left: 0
+ right: 10
+
+
+failures:
+    tests::test_attack_patterns
+    tests::test_combined_creation_utilities
+    tests::test_stress_cycle_utility
+    tests::test_utilities_basic_functionality
+
+test result: FAILED. 0 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
