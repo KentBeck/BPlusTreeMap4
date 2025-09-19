@@ -1,0 +1,15 @@
+[package]
+name = "bplustree"
+version = "0.1.0"
+edition = "2021"
+description = "Raw-memory B+ tree map with fixed-size nodes"
+license = "MIT"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+
+[features]
+default = ["std"]
+std = []
