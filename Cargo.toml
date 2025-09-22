@@ -11,5 +11,7 @@ path = "src/lib.rs"
 [dependencies]
 
 [features]
-default = ["std"]
+default = ["std", "compat_test_api"]
 std = []
+# Enables test-only compatibility APIs used by the imported test suites.
+compat_test_api = []

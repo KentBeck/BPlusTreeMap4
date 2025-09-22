@@ -255,16 +255,7 @@ pub struct LeafParts<K, V> {
     pub vals_ptr: *mut MaybeUninit<V>,
 }
 
-impl<K, V> LeafParts<K, V> {
-    #[inline]
-    pub unsafe fn keys_slice_mut<'a>(&self, layout: &LeafLayout) -> &'a mut [MaybeUninit<K>] {
-        core::slice::from_raw_parts_mut(self.keys_ptr, layout.cap as usize)
-    }
-    #[inline]
-    pub unsafe fn vals_slice_mut<'a>(&self, layout: &LeafLayout) -> &'a mut [MaybeUninit<V>] {
-        core::slice::from_raw_parts_mut(self.vals_ptr, layout.cap as usize)
-    }
-}
+impl<K, V> LeafParts<K, V> {}
 
 #[derive(Copy, Clone)]
 pub struct BranchParts<K> {
@@ -273,19 +264,7 @@ pub struct BranchParts<K> {
     pub keys_ptr: *mut MaybeUninit<K>,
 }
 
-impl<K> BranchParts<K> {
-    #[inline]
-    pub unsafe fn keys_slice_mut<'a>(&self, layout: &BranchLayout) -> &'a mut [MaybeUninit<K>] {
-        core::slice::from_raw_parts_mut(self.keys_ptr, layout.cap as usize)
-    }
-    #[inline]
-    pub unsafe fn children_slice_mut<'a>(
-        &self,
-        layout: &BranchLayout,
-    ) -> &'a mut [MaybeUninit<*mut u8>] {
-        core::slice::from_raw_parts_mut(self.children_ptr, layout.cap as usize + 1)
-    }
-}
+impl<K> BranchParts<K> {}
 
 /// Carve a leaf node's header, sibling pointers, and arrays from a raw base pointer.
 #[inline]
