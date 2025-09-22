@@ -173,88 +173,7 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         }
     }
 
-    #[cfg(any())]
-    unsafe fn split_leaf_root_and_insert(&mut self, root: NonNull<u8>, key: K, value: V) {
-        // Gather existing items
-        let parts = crate::layout::carve_leaf::<K, V>(root, &self.leaf_layout);
-        let hdr = &mut *parts.hdr;
-        let len = hdr.len as usize;
-        let mut items: alloc::vec::Vec<(K, V)> = alloc::vec::Vec::with_capacity(len + 1);
-        // Read out existing K,V (move them)
-        for i in 0..len {
-            let (k, v) = self.read_kv_at(parts.keys_ptr as *const K, parts.vals_ptr as *const V, i);
-            items.push((k, v));
-        }
-        // Insert new (k,v) maintaining order
-        let pos = items.binary_search_by(|(kk, _)| kk.cmp(&key)).unwrap_or_else(|e| e);
-        items.insert(pos, (key, value));
-
-        // Split into left/right
-        let total = items.len();
-        let left_count = total / 2; // floor
-        let right_count = total - left_count;
-
-        // Prevent Vec from dropping moved elements; we will free buffer manually
-        let mut items = core::mem::ManuallyDrop::new(items);
-        let base = items.as_mut_ptr();
-        let cap_vec = items.capacity();
-
-        // Write back left
-        for i in 0..left_count {
-            let (kk, vv) = core::ptr::read(base.add(i));
-            self.write_kv_at(parts.keys_ptr as *mut K, parts.vals_ptr as *mut V, i, kk, vv);
-        }
-        hdr.len = left_count as u16;
-
-        // Allocate right leaf
-        let right = alloc_leaf_block(&self.leaf_layout).expect("alloc right leaf");
-        let rparts = crate::layout::carve_leaf::<K, V>(right, &self.leaf_layout);
-        let rhdr = &mut *rparts.hdr;
-        rhdr.len = right_count as u16;
-        // Separator is first key of right half
-        // Write right items
-        for i in 0..right_count {
-            let (kk, vv) = core::ptr::read(base.add(left_count + i));
-            self.write_kv_at(rparts.keys_ptr as *mut K, rparts.vals_ptr as *mut V, i, kk, vv);
-        }
-        // Free the temporary buffer (elements already moved)
-        let _ = alloc::vec::Vec::<(K, V)>::from_raw_parts(base, 0, cap_vec);
-        // Link leaves: left -> right
-        // right.next = left.next; right.prev = left; left.next = right; fix next.prev if present
-        let left_next_ptr = parts.next_ptr;
-        let old_next = *left_next_ptr;
-        *left_next_ptr = right.as_ptr();
-        if let Some(_) = self.leaf_layout.prev_off {
-            let rprev = rparts.prev_ptr.unwrap();
-            *rprev = root.as_ptr();
-        }
-        if !old_next.is_null() {
-            if let Some(prev_off) = self.leaf_layout.prev_off {
-                let prev_ptr = (old_next.add(prev_off)) as *mut *mut u8;
-                *prev_ptr = right.as_ptr();
-            }
-            if let Some(_) = rparts.prev_ptr { /* already linked */ }
-            let rnext = rparts.next_ptr;
-            *rnext = old_next;
-        }
-
-        // Promote to a branch root
-        let branch = alloc_branch_block(&self.branch_layout).expect("alloc branch root");
-        let bparts = crate::layout::carve_branch::<K>(branch, &self.branch_layout);
-        let bhdr = &mut *bparts.hdr;
-        bhdr.len = 1;
-        // Write separator key
-        let sep_k_val = self.key_clone_at(rparts.keys_ptr as *const K, 0);
-        core::ptr::write(bparts.keys_ptr as *mut K, sep_k_val);
-        // Children
-        let c0 = bparts.children_ptr as *mut *mut u8;
-        let c1 = c0.add(1);
-        *c0 = root.as_ptr();
-        *c1 = right.as_ptr();
-
-        // Update tree root
-        self.root = Some(branch);
-    }
+    // split_leaf_root_and_insert removed
     pub fn get(&self, key: &K) -> Option<&V> {
         let (parts, idx) = self.leaf_search(key)?;
         unsafe { Some(&*(parts.vals_ptr.add(idx) as *const V)) }
@@ -486,9 +405,9 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         let rcbase = rb.children_ptr as *mut *mut u8;
         for i in 0..right_children_len { *rcbase.add(i) = *childs.as_ptr().add(mid + 1 + i); }
 
-        // Prevent dropping moved keys: reclaim vectors with length 0 to free buffers only
-        let _ = alloc::vec::Vec::<K>::from_raw_parts(keys_vec.as_mut_ptr(), 0, keys_vec.capacity());
-        let _ = alloc::vec::Vec::<*mut u8>::from_raw_parts(childs.as_mut_ptr(), 0, childs.capacity());
+        // Prevent dropping moved keys: set length to 0 so drop only frees buffers
+        keys_vec.set_len(0);
+        childs.set_len(0);
 
         InsertResult::Split { sep_key: promote, right: right_node, old_value }
     }
@@ -514,19 +433,23 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
                     InsertResult::NoSplit(None)
                 } else {
                     // Split leaf using temporary Vec of pairs
-                    let mut items: alloc::vec::Vec<(K, V)> = alloc::vec::Vec::with_capacity(len + 1);
+                    let mut items_vec: alloc::vec::Vec<(K, V)> = alloc::vec::Vec::with_capacity(len + 1);
                     for i in 0..len {
                         let (k, v) = self.read_kv_at(parts.keys_ptr as *const K, parts.vals_ptr as *const V, i);
-                        items.push((k, v));
+                        items_vec.push((k, v));
                     }
-                    let pos = items.binary_search_by(|(kk, _)| kk.cmp(&key)).unwrap_or_else(|e| e);
-                    items.insert(pos, (key, value));
-                    let total = items.len();
+                    let pos = items_vec.binary_search_by(|(kk, _)| kk.cmp(&key)).unwrap_or_else(|e| e);
+                    items_vec.insert(pos, (key, value));
+                    let total = items_vec.len();
                     let left_count = total / 2;
                     let right_count = total - left_count;
+                    // Prevent dropping moved elements: convert to ManuallyDrop and work with base pointer
+                    let mut items = core::mem::ManuallyDrop::new(items_vec);
+                    let base = items.as_mut_ptr();
+                    let cap = items.capacity();
                     // Write left back
                     for i in 0..left_count {
-                        let (kk, vv) = core::ptr::read(items.as_ptr().add(i));
+                        let (kk, vv) = core::ptr::read(base.add(i));
                         self.write_kv_at(parts.keys_ptr as *mut K, parts.vals_ptr as *mut V, i, kk, vv);
                     }
                     hdr.len = left_count as u16;
@@ -536,9 +459,11 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
                     let r = crate::layout::carve_leaf::<K, V>(right, &self.leaf_layout);
                     (*r.hdr).len = right_count as u16;
                     for i in 0..right_count {
-                        let (kk, vv) = core::ptr::read(items.as_ptr().add(left_count + i));
+                        let (kk, vv) = core::ptr::read(base.add(left_count + i));
                         self.write_kv_at(r.keys_ptr as *mut K, r.vals_ptr as *mut V, i, kk, vv);
                     }
+                    // Reclaim buffer
+                    let _ = alloc::vec::Vec::<(K, V)>::from_raw_parts(base, 0, cap);
                     // Link leaves
                     // right.next = left.next; right.prev = left; left.next = right; fix next.prev
                     let left_next = parts.next_ptr;
