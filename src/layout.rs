@@ -109,6 +109,45 @@ impl LeafLayout {
 
         best
     }
+
+    /// Compute a leaf layout targeting an exact capacity (number of key/value pairs).
+    pub fn compute_for_cap<K, V>(cap: u16, doubly_linked: bool) -> Self {
+        let a_ptr = align_of::<*const ()>();
+        let a_k = align_of::<K>();
+        let a_v = align_of::<V>();
+        let s_ptr = size_of::<*const ()>();
+        let s_k = size_of::<K>();
+        let s_v = size_of::<V>();
+
+        let max_align = a_ptr.max(a_k).max(a_v).max(align_of::<NodeHdr>());
+        let hdr_size = align_up(size_of::<NodeHdr>(), max_align);
+
+        let sib_bytes = if doubly_linked { 2 * s_ptr } else { s_ptr };
+        let sib_off = align_up(hdr_size, a_ptr);
+        let after_sib = sib_off + sib_bytes;
+
+        let cap_usize = cap as usize;
+        let first_is_keys = a_k >= a_v;
+        let (a1, s1, a2, s2) = if first_is_keys { (a_k, s_k, a_v, s_v) } else { (a_v, s_v, a_k, s_k) };
+
+        let first_off = align_up(after_sib, a1);
+        let second_off = align_up(first_off + cap_usize * s1, a2);
+        let end = second_off + cap_usize * s2;
+        let end_aligned = align_up(end, max_align);
+
+        let (keys_off, vals_off) = if first_is_keys { (first_off, second_off) } else { (second_off, first_off) };
+
+        Self {
+            bytes: end_aligned,
+            cap,
+            max_align,
+            hdr_size,
+            next_off: sib_off,
+            prev_off: if doubly_linked { Some(sib_off + s_ptr) } else { None },
+            keys_off,
+            vals_off,
+        }
+    }
 }
 
 impl BranchLayout {
@@ -172,6 +211,34 @@ impl BranchLayout {
         }
 
         best
+    }
+
+    /// Compute a branch layout targeting an exact capacity (number of keys).
+    pub fn compute_for_cap<K>(cap: u16) -> Self {
+        let a_ptr = align_of::<*const ()>();
+        let a_k = align_of::<K>();
+        let s_ptr = size_of::<*const ()>();
+        let s_k = size_of::<K>();
+        let max_align = a_ptr.max(a_k).max(align_of::<NodeHdr>());
+        let hdr_size = align_up(size_of::<NodeHdr>(), max_align);
+
+        let children_first = a_ptr >= a_k;
+        let first_a = if children_first { a_ptr } else { a_k };
+        let first_s = if children_first { s_ptr } else { s_k };
+        let first_len = if children_first { cap as usize + 1 } else { cap as usize };
+
+        let second_a = if children_first { a_k } else { a_ptr };
+        let second_s = if children_first { s_k } else { s_ptr };
+        let second_len = if children_first { cap as usize } else { cap as usize + 1 };
+
+        let first_off = align_up(hdr_size, first_a);
+        let second_off = align_up(first_off + first_len * first_s, second_a);
+        let end = second_off + second_len * second_s;
+        let end_aligned = align_up(end, max_align);
+
+        let (children_off, keys_off) = if children_first { (first_off, second_off) } else { (second_off, first_off) };
+
+        Self { bytes: end_aligned, cap, max_align, hdr_size, children_off, keys_off }
     }
 }
 
@@ -241,4 +308,3 @@ pub unsafe fn carve_branch<K>(base: NonNull<u8>, layout: &BranchLayout) -> Branc
     let keys_ptr = p.add(layout.keys_off) as *mut MaybeUninit<K>;
     BranchParts { hdr, children_ptr, keys_ptr }
 }
-

@@ -3,7 +3,7 @@ extern crate alloc;
 use alloc::alloc::{alloc, dealloc, Layout};
 use core::ptr::{self, NonNull};
 
-use crate::layout::{carve_branch, carve_leaf, BranchLayout, LeafLayout, NodeHdr, NodeTag};
+use crate::layout::{carve_leaf, BranchLayout, LeafLayout, NodeHdr, NodeTag};
 
 #[inline]
 fn layout_for(bytes: usize, align: usize) -> Layout {
@@ -61,4 +61,3 @@ pub unsafe fn init_branch_block(base: NonNull<u8>) {
     let hdr = base.as_ptr() as *mut NodeHdr;
     ptr::write(hdr, NodeHdr { tag: NodeTag::Branch, len: 0, flags: 0 });
 }
-

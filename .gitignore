@@ -1,4 +1,5 @@
 target/
 vendor/
+logs/
 **/*.rs.bk
 .DS_Store
