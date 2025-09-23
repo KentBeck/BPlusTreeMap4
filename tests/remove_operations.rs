@@ -242,7 +242,6 @@ fn test_demonstrates_need_for_borrowing_and_merging() {
 }
 
 #[test]
-#[should_panic(expected = "Tree invariants violated")]
 fn test_underfull_nodes_violate_invariants() {
     // This test demonstrates that underfull nodes violate B+ tree invariants
     // It should fail when proper invariant checking is enabled
@@ -260,22 +259,17 @@ fn test_underfull_nodes_violate_invariants() {
     }
 
     // At this point we should have underfull nodes
-    let leaf_sizes = tree.leaf_sizes();
-    let min_keys = 3; // For capacity 4
-    let has_underfull = leaf_sizes.iter().any(|&size| size < min_keys && size > 0);
-
-    if has_underfull {
-        println!("Underfull nodes detected with sizes: {:?}", leaf_sizes);
-        println!("This violates B+ tree invariants!");
-
-        // This should fail if invariant checking was enabled
-        // For now, we'll manually trigger the failure to demonstrate the issue
-        panic!("Tree invariants violated: underfull nodes detected");
-    }
+    assert!(
+        !tree.check_invariants(),
+        "tree invariants should fail in presence of underfull leaves"
+    );
+    assert!(
+        tree.check_invariants_detailed().is_err(),
+        "detailed invariant check should report an error"
+    );
 }
 
 #[test]
-#[should_panic(expected = "Tree invariants violated")]
 fn test_strict_invariant_checking_should_fail() {
     // This test uses the built-in strict invariant checking that includes underfull detection
     // It should fail, demonstrating that the current implementation violates B+ tree invariants
@@ -297,9 +291,14 @@ fn test_strict_invariant_checking_should_fail() {
     println!("Leaf sizes: {:?}", tree.leaf_sizes());
 
     // Now that all invariants are strict, this should fail
-    if tree.check_invariants() {
-        panic!("Tree invariants violated: expected invariants to fail due to underfull nodes");
-    }
+    assert!(
+        !tree.check_invariants(),
+        "strict invariants should fail after creating underfull nodes"
+    );
+    assert!(
+        tree.check_invariants_detailed().is_err(),
+        "detailed invariants should report underfull nodes"
+    );
 }
 
 #[test]

@@ -31,6 +31,12 @@ pub struct BPlusTreeMap<K, V> {
     len_count: usize,
 }
 
+struct ValidationState<K> {
+    total_items: usize,
+    prev_leaf: Option<NonNull<u8>>,
+    prev_key: Option<K>,
+}
+
 impl<K, V> BPlusTreeMap<K, V> {
     /// Common cache line size assumption (bytes).
     pub const CACHE_LINE_BYTES: usize = 64;
@@ -328,25 +334,27 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
             return None;
         }
 
-        let mut items: alloc::vec::Vec<(K, V)> = alloc::vec::Vec::with_capacity(len);
-        for i in 0..len {
-            items.push(self.read_kv_at(parts.keys_ptr as *const K, parts.vals_ptr as *const V, i));
-        }
-
-        let idx = match items.binary_search_by(|(k, _)| k.cmp(key)) {
+        let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
+        let idx = match keys.binary_search(key) {
             Ok(i) => i,
             Err(_) => return None,
         };
 
-        let (removed_key, removed_val) = items.remove(idx);
-        drop(removed_key);
+        let keys_ptr = parts.keys_ptr as *mut K;
+        let vals_ptr = parts.vals_ptr as *mut V;
+        let removed_key = core::ptr::read(keys_ptr.add(idx));
+        let removed_val = core::ptr::read(vals_ptr.add(idx));
 
-        hdr.len = items.len() as u16;
-        for (i, (k, v)) in items.into_iter().enumerate() {
-            self.write_kv_at(parts.keys_ptr as *mut K, parts.vals_ptr as *mut V, i, k, v);
+        if idx + 1 < len {
+            core::ptr::copy(keys_ptr.add(idx + 1), keys_ptr.add(idx), len - idx - 1);
+            core::ptr::copy(vals_ptr.add(idx + 1), vals_ptr.add(idx), len - idx - 1);
+            core::ptr::drop_in_place(keys_ptr.add(len - 1));
+            core::ptr::drop_in_place(vals_ptr.add(len - 1));
         }
 
+        hdr.len = (len - 1) as u16;
         self.len_count -= 1;
+        drop(removed_key);
         Some(removed_val)
     }
 
@@ -651,10 +659,251 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         (0, 0)
     }
     pub fn check_invariants(&self) -> bool {
-        true
+        self.check_invariants_detailed().is_ok()
     }
     pub fn check_invariants_detailed(&self) -> Result<(), String> {
-        Ok(())
+        let mut state = ValidationState {
+            total_items: 0,
+            prev_leaf: None,
+            prev_key: None,
+        };
+
+        unsafe {
+            match self.root {
+                None => {
+                    if self.len_count == 0 {
+                        Ok(())
+                    } else {
+                        Err("Tree has no root but len_count > 0".into())
+                    }
+                }
+                Some(root) => {
+                    self.validate_node(root, None, None, true, &mut state)?;
+
+                    if self.len_count != state.total_items {
+                        return Err(format!(
+                            "len_count mismatch: recorded {}, actual {}",
+                            self.len_count, state.total_items
+                        ));
+                    }
+
+                    if let Some(last_leaf) = state.prev_leaf {
+                        let next_ptr =
+                            *(last_leaf.as_ptr().add(self.leaf_layout.next_off) as *const *mut u8);
+                        if !next_ptr.is_null() {
+                            return Err("Tail leaf next pointer should be null".into());
+                        }
+                    }
+
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    unsafe fn validate_node(
+        &self,
+        node: NonNull<u8>,
+        lower: Option<&K>,
+        upper: Option<&K>,
+        is_root: bool,
+        state: &mut ValidationState<K>,
+    ) -> Result<Option<(K, K)>, String> {
+        let hdr = &*(node.as_ptr() as *const NodeHdr);
+        match hdr.tag {
+            NodeTag::Leaf => self.validate_leaf(node, lower, upper, is_root, state),
+            NodeTag::Branch => self.validate_branch(node, lower, upper, is_root, state),
+        }
+    }
+
+    unsafe fn validate_leaf(
+        &self,
+        leaf: NonNull<u8>,
+        lower: Option<&K>,
+        upper: Option<&K>,
+        is_root: bool,
+        state: &mut ValidationState<K>,
+    ) -> Result<Option<(K, K)>, String> {
+        let parts = crate::layout::carve_leaf::<K, V>(leaf, &self.leaf_layout);
+        let hdr = &*parts.hdr;
+        let len = hdr.len as usize;
+        let cap = self.leaf_layout.cap as usize;
+
+        if len > cap {
+            return Err(format!("Leaf has {} keys but capacity is {}", len, cap));
+        }
+
+        if len == 0 {
+            if is_root {
+                return Ok(None);
+            } else {
+                return Err("Non-root leaf is empty".into());
+            }
+        }
+
+        let min_required = self.min_leaf_len();
+        if !is_root && len < min_required {
+            return Err(format!(
+                "Leaf underfull: has {} keys, minimum is {}",
+                len, min_required
+            ));
+        }
+
+        let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
+
+        for window in keys.windows(2) {
+            if window[0] >= window[1] {
+                return Err("Leaf keys not strictly increasing".into());
+            }
+        }
+
+        if let Some(low) = lower {
+            if keys[0] < *low {
+                return Err("Leaf keys fall below lower bound".into());
+            }
+        }
+        if let Some(high) = upper {
+            if keys[len - 1] >= *high {
+                return Err("Leaf keys exceed upper bound".into());
+            }
+        }
+
+        if let Some(prev_leaf) = state.prev_leaf {
+            let prev_next = *(prev_leaf.as_ptr().add(self.leaf_layout.next_off) as *const *mut u8);
+            if prev_next != leaf.as_ptr() {
+                return Err("Leaf next pointer mismatch".into());
+            }
+        }
+
+        if let Some(prev_ptr) = parts.prev_ptr {
+            match state.prev_leaf {
+                Some(prev) => {
+                    if *prev_ptr != prev.as_ptr() {
+                        return Err("Leaf prev pointer mismatch".into());
+                    }
+                }
+                None => {
+                    if !(*prev_ptr).is_null() {
+                        return Err("First leaf prev pointer should be null".into());
+                    }
+                }
+            }
+        }
+
+        state.prev_leaf = Some(leaf);
+
+        if let Some(prev_key) = &state.prev_key {
+            if keys[0] <= *prev_key {
+                return Err("Leaf keys not globally increasing".into());
+            }
+        }
+        state.prev_key = Some(keys[len - 1].clone());
+        state.total_items += len;
+
+        Ok(Some((keys[0].clone(), keys[len - 1].clone())))
+    }
+
+    unsafe fn validate_branch(
+        &self,
+        branch: NonNull<u8>,
+        lower: Option<&K>,
+        upper: Option<&K>,
+        is_root: bool,
+        state: &mut ValidationState<K>,
+    ) -> Result<Option<(K, K)>, String> {
+        let parts = crate::layout::carve_branch::<K>(branch, &self.branch_layout);
+        let len = (*parts.hdr).len as usize;
+        let cap = self.branch_layout.cap as usize;
+
+        if len > cap {
+            return Err(format!("Branch has {} keys but capacity is {}", len, cap));
+        }
+
+        if len == 0 {
+            if !is_root {
+                return Err("Non-root branch has no keys".into());
+            }
+            let child_ptr = *(parts.children_ptr as *const *mut u8);
+            if child_ptr.is_null() {
+                return Ok(None);
+            }
+        }
+
+        let min_required = self.min_branch_len();
+        if !is_root && len < min_required {
+            return Err(format!(
+                "Branch underfull: has {} keys, minimum is {}",
+                len, min_required
+            ));
+        }
+
+        let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
+        for window in keys.windows(2) {
+            if window[0] >= window[1] {
+                return Err("Branch keys not strictly increasing".into());
+            }
+        }
+
+        if let Some(low) = lower {
+            if len > 0 && keys[0] < *low {
+                return Err("Branch keys fall below lower bound".into());
+            }
+        }
+        if let Some(high) = upper {
+            if len > 0 && keys[len - 1] >= *high {
+                return Err("Branch keys exceed upper bound".into());
+            }
+        }
+
+        let mut subtree_min: Option<K> = None;
+        let mut subtree_max: Option<K> = None;
+
+        for i in 0..=len {
+            let child_ptr = *(parts.children_ptr.add(i) as *const *mut u8);
+            let child = match NonNull::new(child_ptr) {
+                Some(child) => child,
+                None => return Err("Branch child pointer is null".into()),
+            };
+
+            let lower_bound = if i == 0 { lower } else { Some(&keys[i - 1]) };
+            let upper_bound = if i == len { upper } else { Some(&keys[i]) };
+
+            if let Some((child_min, child_max)) =
+                self.validate_node(child, lower_bound, upper_bound, false, state)?
+            {
+                if subtree_min.is_none() {
+                    subtree_min = Some(child_min.clone());
+                }
+                subtree_max = Some(child_max);
+            }
+        }
+
+        Ok(match (subtree_min, subtree_max) {
+            (Some(min), Some(max)) => Some((min, max)),
+            _ => None,
+        })
+    }
+
+    #[inline]
+    fn min_leaf_len(&self) -> usize {
+        let cap = self.leaf_layout.cap as usize;
+        if cap == 0 {
+            0
+        } else {
+            (cap + 1) / 2
+        }
+    }
+
+    #[inline]
+    fn min_branch_len(&self) -> usize {
+        let cap = self.branch_layout.cap as usize;
+        if cap == 0 {
+            0
+        } else if cap <= 2 {
+            1
+        } else {
+            (cap + 1) / 2
+        }
     }
 
     // ===== Arena-like stats compatibility (stubs) =====
