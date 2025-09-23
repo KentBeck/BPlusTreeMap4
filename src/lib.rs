@@ -327,27 +327,26 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         if len == 0 {
             return None;
         }
-        let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
-        let idx = match keys.binary_search(key) {
+
+        let mut items: alloc::vec::Vec<(K, V)> = alloc::vec::Vec::with_capacity(len);
+        for i in 0..len {
+            items.push(self.read_kv_at(parts.keys_ptr as *const K, parts.vals_ptr as *const V, i));
+        }
+
+        let idx = match items.binary_search_by(|(k, _)| k.cmp(key)) {
             Ok(i) => i,
             Err(_) => return None,
         };
 
-        let keys_ptr = parts.keys_ptr as *mut K;
-        let vals_ptr = parts.vals_ptr as *mut V;
-        let removed_key = core::ptr::read(keys_ptr.add(idx));
-        let removed_val = core::ptr::read(vals_ptr.add(idx));
+        let (removed_key, removed_val) = items.remove(idx);
+        drop(removed_key);
 
-        if idx + 1 < len {
-            core::ptr::copy(keys_ptr.add(idx + 1), keys_ptr.add(idx), len - idx - 1);
-            core::ptr::copy(vals_ptr.add(idx + 1), vals_ptr.add(idx), len - idx - 1);
-            core::ptr::drop_in_place(keys_ptr.add(len - 1));
-            core::ptr::drop_in_place(vals_ptr.add(len - 1));
+        hdr.len = items.len() as u16;
+        for (i, (k, v)) in items.into_iter().enumerate() {
+            self.write_kv_at(parts.keys_ptr as *mut K, parts.vals_ptr as *mut V, i, k, v);
         }
 
-        hdr.len = (len - 1) as u16;
         self.len_count -= 1;
-        drop(removed_key);
         Some(removed_val)
     }
 
