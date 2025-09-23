@@ -77,6 +77,75 @@ fn test_underfull_child_rebalancing_path() {
 }
 
 #[test]
+fn test_leaf_borrow_from_right_sibling() {
+    let mut tree = create_tree_capacity_int(4);
+
+    // Build two leaves under a branch root
+    for key in [10, 20, 30, 40, 50, 60] {
+        tree.insert(key, key * 10);
+    }
+
+    // Current layout: first leaf holds {10,20,30}, second leaf {40,50,60}
+    // Remove a key from the first leaf to make it underfull (capacity 4 => min keys 2)
+    assert_eq!(tree.remove(&10), Some(100));
+    assert_eq!(tree.remove(&20), Some(200));
+
+    // First leaf now has {30}; second leaf still has {40,50,60}
+    // After rebalancing we expect first leaf to borrow 40 from the right (check that 40 moved)
+    assert_eq!(tree.get(&30), Some(&300));
+    assert_eq!(tree.get(&40), Some(&400));
+    assert_eq!(tree.get(&50), Some(&500));
+    assert_eq!(tree.get(&60), Some(&600));
+
+    // Tree should retain four items
+    assert_eq!(tree.len(), 4);
+    assert_invariants_int(&tree, "leaf borrow from right sibling");
+}
+
+#[test]
+fn test_leaf_borrow_from_left_sibling() {
+    let mut tree = create_tree_capacity_int(4);
+
+    // construct two leaves; first gets more keys so it can lend to the second
+    for key in [10, 20, 30, 40, 50, 60] {
+        tree.insert(key, key * 10);
+    }
+
+    // Remove from the right leaf to make it underfull
+    assert_eq!(tree.remove(&40), Some(400));
+    assert_eq!(tree.remove(&50), Some(500));
+
+    // Expect right leaf to borrow from left sibling, keeping keys accessible
+    assert_eq!(tree.get(&10), Some(&100));
+    assert_eq!(tree.get(&20), Some(&200));
+    assert_eq!(tree.get(&30), Some(&300));
+    assert_eq!(tree.get(&60), Some(&600));
+    assert_eq!(tree.len(), 4);
+    assert_invariants_int(&tree, "leaf borrow from left sibling");
+}
+
+#[test]
+fn test_leaf_merge_when_siblings_underfull() {
+    let mut tree = create_tree_capacity_int(4);
+
+    for key in [10, 20, 30, 40, 50] {
+        tree.insert(key, key * 10);
+    }
+
+    // Remove enough keys so both leaves hit min before deletion
+    tree.remove(&10);
+    tree.remove(&20);
+    tree.remove(&40);
+
+    // Removing 30 forces merge of the two leaves
+    assert_eq!(tree.remove(&30), Some(300));
+
+    assert_eq!(tree.len(), 1);
+    assert_eq!(tree.get(&50), Some(&500));
+    assert_invariants_int(&tree, "leaf merge scenario");
+}
+
+#[test]
 fn test_underfull_leaf_detection() {
     // This test specifically verifies that we can detect underfull conditions
     // and demonstrates the current behavior where underfull nodes are left as-is
