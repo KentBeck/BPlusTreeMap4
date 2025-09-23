@@ -184,21 +184,7 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
     }
     pub fn remove(&mut self, key: &K) -> Option<V> {
         let root = self.root?;
-        unsafe {
-            let parts = crate::layout::carve_leaf::<K, V>(root, &self.leaf_layout);
-            let hdr = &mut *parts.hdr;
-            let len = hdr.len as usize;
-            let keys_slice = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
-            if let Ok(idx) = keys_slice.binary_search(key) {
-                let old = core::ptr::read(parts.vals_ptr.add(idx) as *mut V);
-                self.shift_left(parts.keys_ptr as *mut K, parts.vals_ptr as *mut V, idx, len);
-                hdr.len = (len - 1) as u16;
-                self.len_count -= 1;
-                Some(old)
-            } else {
-                None
-            }
-        }
+        unsafe { self.remove_rec(root, key) }
     }
     pub fn get_item(&self, key: &K) -> Result<&V, BPlusTreeError> {
         self.get(key).ok_or(BPlusTreeError::KeyNotFound)
@@ -243,14 +229,6 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
     }
 
     #[inline]
-    unsafe fn shift_left(&self, keys_ptr: *mut K, vals_ptr: *mut V, idx: usize, len: usize) {
-        if idx + 1 <= len {
-            core::ptr::copy(keys_ptr.add(idx + 1), keys_ptr.add(idx), len - idx - 1);
-            core::ptr::copy(vals_ptr.add(idx + 1), vals_ptr.add(idx), len - idx - 1);
-        }
-    }
-
-    #[inline]
     unsafe fn write_kv_at(&self, keys_ptr: *mut K, vals_ptr: *mut V, idx: usize, key: K, val: V) {
         core::ptr::write(keys_ptr.add(idx), key);
         core::ptr::write(vals_ptr.add(idx), val);
@@ -271,6 +249,61 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
     #[inline]
     unsafe fn key_clone_at(&self, keys_ptr: *const K, idx: usize) -> K where K: Clone {
         (*keys_ptr.add(idx)).clone()
+    }
+
+    unsafe fn remove_rec(&mut self, node: NonNull<u8>, key: &K) -> Option<V> {
+        let hdr = &*(node.as_ptr() as *const NodeHdr);
+        match hdr.tag {
+            NodeTag::Leaf => self.remove_from_leaf(node, key),
+            NodeTag::Branch => self.remove_from_branch(node, key),
+        }
+    }
+
+    unsafe fn remove_from_leaf(&mut self, leaf: NonNull<u8>, key: &K) -> Option<V> {
+        let parts = crate::layout::carve_leaf::<K, V>(leaf, &self.leaf_layout);
+        let hdr = &mut *parts.hdr;
+        let len = hdr.len as usize;
+        if len == 0 {
+            return None;
+        }
+        let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
+        let idx = match keys.binary_search(key) {
+            Ok(i) => i,
+            Err(_) => return None,
+        };
+
+        let keys_ptr = parts.keys_ptr as *mut K;
+        let vals_ptr = parts.vals_ptr as *mut V;
+        let removed_key = core::ptr::read(keys_ptr.add(idx));
+        let removed_val = core::ptr::read(vals_ptr.add(idx));
+
+        if idx + 1 < len {
+            core::ptr::copy(keys_ptr.add(idx + 1), keys_ptr.add(idx), len - idx - 1);
+            core::ptr::copy(vals_ptr.add(idx + 1), vals_ptr.add(idx), len - idx - 1);
+            core::ptr::drop_in_place(keys_ptr.add(len - 1));
+            core::ptr::drop_in_place(vals_ptr.add(len - 1));
+        }
+
+        hdr.len = (len - 1) as u16;
+        self.len_count -= 1;
+        drop(removed_key);
+        Some(removed_val)
+    }
+
+    unsafe fn remove_from_branch(&mut self, branch: NonNull<u8>, key: &K) -> Option<V> {
+        let parts = crate::layout::carve_branch::<K>(branch, &self.branch_layout);
+        let len = (*parts.hdr).len as usize;
+        let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
+        let child_idx = match keys.binary_search(key) {
+            Ok(i) => i + 1,
+            Err(i) => i,
+        };
+        let child_ptr = *(parts.children_ptr.add(child_idx) as *const *mut u8);
+        let child = match NonNull::new(child_ptr) {
+            Some(c) => c,
+            None => return None,
+        };
+        self.remove_rec(child, key)
     }
 
     #[inline]

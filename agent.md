@@ -20,5 +20,8 @@ This repository is being brought up as a raw-memory B+ tree map. The plan is to 
   - Implement branch descent and splitting.
   - Add deletion with borrow/merge.
   - Implement iterators and range (DoubleEndedIterator over linked leaves).
-  - Replace invariant stubs with real validation.
+- Replace invariant stubs with real validation.
 
+## Working Agreement
+
+- Adopt strict TDD: pick a single failing test, make it pass, then refactor if there is an obvious improvement before moving on to the next test.
