@@ -127,3 +127,49 @@ fn test_delete_forces_root_collapse() {
         "root collapse should leave a single leaf"
     );
 }
+
+#[test]
+fn test_delete_last_forces_root_collapse() {
+    let mut tree = create_tree_capacity_int(4);
+    for i in 0..5 {
+        tree.insert(i, i * 10);
+    }
+    assert!(!tree.is_leaf_root());
+    assert_eq!(
+        tree.leaf_count(),
+        2,
+        "setup should create a branch root with two leaves"
+    );
+
+    reset_alloc_metrics();
+    let removed = tree.remove(&4);
+    let (alloc_calls, _alloc_bytes, dealloc_calls, dealloc_bytes) = alloc_metrics();
+
+    assert_eq!(removed, Some(40));
+    assert_eq!(
+        alloc_calls, 0,
+        "root collapse should not allocate new nodes"
+    );
+    assert_eq!(
+        dealloc_calls, 2,
+        "root collapse should free the emptied leaf and the old branch root",
+    );
+
+    let expected_dealloc_bytes = tree.leaf_layout().bytes + tree.branch_layout().bytes;
+    assert_eq!(
+        dealloc_bytes, expected_dealloc_bytes,
+        "freed {} bytes but expected {}",
+        dealloc_bytes, expected_dealloc_bytes,
+    );
+
+    for i in 0..4 {
+        assert_eq!(tree.get(&i), Some(&(i * 10)));
+    }
+    assert_eq!(tree.get(&4), None);
+    assert!(tree.is_leaf_root());
+    assert_eq!(
+        tree.leaf_count(),
+        1,
+        "root collapse should leave a single leaf"
+    );
+}
