@@ -4,7 +4,30 @@ use core::ptr::NonNull;
 impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
     pub fn remove(&mut self, key: &K) -> Option<V> {
         let root = self.root?;
-        unsafe { self.remove_rec(root, key) }
+        let result = unsafe { self.remove_rec(root, key) };
+        if result.is_some() {
+            unsafe { self.check_root_collapse() };
+        }
+        result
+    }
+
+    unsafe fn check_root_collapse(&mut self) {
+        if let Some(root) = self.root {
+            let hdr = &*(root.as_ptr() as *const NodeHdr);
+            if hdr.tag == NodeTag::Branch {
+                let parts = layout::carve_branch::<K>(root, &self.branch_layout);
+                let len = (*parts.hdr).len as usize;
+                if len <= 1 {
+                    let child_ptr = *(parts.children_ptr as *const *mut u8);
+                    if !child_ptr.is_null() {
+                        let child_hdr = &*(child_ptr as *const NodeHdr);
+                        if child_hdr.tag == NodeTag::Leaf {
+                            self.root = NonNull::new(child_ptr);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     unsafe fn remove_rec(&mut self, node: NonNull<u8>, key: &K) -> Option<V> {
