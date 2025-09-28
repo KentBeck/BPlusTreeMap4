@@ -173,3 +173,38 @@ fn test_delete_last_forces_root_collapse() {
         "root collapse should leave a single leaf"
     );
 }
+
+#[test]
+fn test_delete_requires_branch_borrow() {
+    let mut tree = create_tree_capacity_int(4);
+    for i in 0..60 {
+        tree.insert(i, i * 10);
+    }
+
+    assert!(
+        tree.check_invariants(),
+        "tree should start in a valid state"
+    );
+    assert!(
+        !tree.is_leaf_root(),
+        "inserting many items should create an internal root"
+    );
+    let max_leaves_without_third_level = tree.branch_layout().cap as usize + 1;
+    assert!(
+        tree.leaf_count() > max_leaves_without_third_level,
+        "expected at least three levels so we can exercise internal borrowing"
+    );
+
+    for key in 0..40 {
+        assert_eq!(tree.remove(&key), Some(key * 10));
+        assert!(
+            tree.check_invariants(),
+            "deletion should not violate invariants"
+        );
+    }
+
+    assert!(
+        tree.check_invariants(),
+        "deletion should rebalance internal branches instead of leaving them underfull"
+    );
+}

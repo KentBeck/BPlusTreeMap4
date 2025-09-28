@@ -139,13 +139,479 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         (*source_parts.hdr).len = 0;
     }
 
+    unsafe fn fix_branch_child(&mut self, branch: NonNull<u8>, child_idx: usize) {
+        let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
+        let len = (*parts.hdr).len as usize;
+        if len == 0 {
+            return;
+        }
+
+        let children = parts.children_ptr as *mut *mut u8;
+        let idx = child_idx.min(len);
+        let child_ptr = *children.add(idx);
+        let Some(_) = NonNull::new(child_ptr) else {
+            return;
+        };
+
+        let child_hdr = &*(child_ptr as *const NodeHdr);
+        match child_hdr.tag {
+            NodeTag::Leaf => self.rebalance_leaf_child(branch, idx, len),
+            NodeTag::Branch => self.rebalance_branch_child(branch, idx, len),
+        }
+    }
+
+    unsafe fn rebalance_leaf_child(
+        &mut self,
+        branch: NonNull<u8>,
+        child_idx: usize,
+        branch_len: usize,
+    ) {
+        let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
+        let children = parts.children_ptr as *mut *mut u8;
+
+        let child_ptr = *children.add(child_idx);
+        let child = NonNull::new_unchecked(child_ptr);
+        let child_parts = layout::carve_leaf::<K, V>(child, &self.leaf_layout);
+        let child_len = (*child_parts.hdr).len as usize;
+        let min = self.min_leaf_len();
+        if child_len >= min {
+            return;
+        }
+
+        if child_idx > 0 {
+            let left_ptr = *children.add(child_idx - 1);
+            if let Some(left) = NonNull::new(left_ptr) {
+                let left_hdr = &*(left_ptr as *const NodeHdr);
+                if left_hdr.tag == NodeTag::Leaf {
+                    let left_parts = layout::carve_leaf::<K, V>(left, &self.leaf_layout);
+                    let left_len = (*left_parts.hdr).len as usize;
+                    if left_len > min {
+                        self.borrow_from_left_leaf(branch, child_idx);
+                        return;
+                    }
+                }
+            }
+        }
+
+        if child_idx < branch_len {
+            let right_ptr = *children.add(child_idx + 1);
+            if let Some(right) = NonNull::new(right_ptr) {
+                let right_hdr = &*(right_ptr as *const NodeHdr);
+                if right_hdr.tag == NodeTag::Leaf {
+                    let right_parts = layout::carve_leaf::<K, V>(right, &self.leaf_layout);
+                    let right_len = (*right_parts.hdr).len as usize;
+                    if right_len > min {
+                        self.borrow_from_right_leaf(branch, child_idx);
+                        return;
+                    }
+                }
+            }
+        }
+
+        if child_idx > 0 {
+            self.merge_leaf_with_left(branch, child_idx);
+        } else if child_idx < branch_len {
+            self.merge_leaf_with_right(branch, child_idx);
+        }
+    }
+
+    unsafe fn rebalance_branch_child(
+        &mut self,
+        branch: NonNull<u8>,
+        child_idx: usize,
+        branch_len: usize,
+    ) {
+        let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
+        let children = parts.children_ptr as *mut *mut u8;
+
+        let child_ptr = *children.add(child_idx);
+        let child = NonNull::new_unchecked(child_ptr);
+        let child_parts = layout::carve_branch::<K>(child, &self.branch_layout);
+        let child_len = (*child_parts.hdr).len as usize;
+        let min = self.min_branch_len();
+        if child_len >= min {
+            return;
+        }
+
+        if child_idx > 0 {
+            let left_ptr = *children.add(child_idx - 1);
+            if let Some(left) = NonNull::new(left_ptr) {
+                let left_parts = layout::carve_branch::<K>(left, &self.branch_layout);
+                let left_len = (*left_parts.hdr).len as usize;
+                if left_len > min {
+                    self.borrow_from_left_branch(branch, child_idx);
+                    return;
+                }
+            }
+        }
+
+        if child_idx < branch_len {
+            let right_ptr = *children.add(child_idx + 1);
+            if let Some(right) = NonNull::new(right_ptr) {
+                let right_parts = layout::carve_branch::<K>(right, &self.branch_layout);
+                let right_len = (*right_parts.hdr).len as usize;
+                if right_len > min {
+                    self.borrow_from_right_branch(branch, child_idx);
+                    return;
+                }
+            }
+        }
+
+        if child_idx > 0 {
+            self.merge_branch_with_left(branch, child_idx);
+        } else if child_idx < branch_len {
+            self.merge_branch_with_right(branch, child_idx);
+        }
+    }
+
+    unsafe fn borrow_from_left_branch(&mut self, branch: NonNull<u8>, child_idx: usize) {
+        let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
+        let children = parts.children_ptr as *mut *mut u8;
+
+        let left_ptr = *children.add(child_idx - 1);
+        let child_ptr = *children.add(child_idx);
+        let left = NonNull::new_unchecked(left_ptr);
+        let child = NonNull::new_unchecked(child_ptr);
+
+        let left_parts = layout::carve_branch::<K>(left, &self.branch_layout);
+        let child_parts = layout::carve_branch::<K>(child, &self.branch_layout);
+
+        let left_len = (*left_parts.hdr).len as usize;
+        let child_len = (*child_parts.hdr).len as usize;
+
+        let sep_slot = (parts.keys_ptr as *mut K).add(child_idx - 1);
+        let parent_key = core::ptr::read(sep_slot);
+
+        let left_keys = left_parts.keys_ptr as *mut K;
+        let left_children = left_parts.children_ptr as *mut *mut u8;
+        let borrowed_key = core::ptr::read(left_keys.add(left_len - 1));
+        let borrowed_child = *left_children.add(left_len);
+        (*left_parts.hdr).len = (left_len - 1) as u16;
+        *left_children.add(left_len) = ptr::null_mut();
+
+        let child_keys = child_parts.keys_ptr as *mut K;
+        let child_children = child_parts.children_ptr as *mut *mut u8;
+        if child_len > 0 {
+            core::ptr::copy(child_keys, child_keys.add(1), child_len);
+        }
+        core::ptr::copy(child_children, child_children.add(1), child_len + 1);
+        core::ptr::write(child_keys, parent_key);
+        *child_children.add(0) = borrowed_child;
+        (*child_parts.hdr).len = (child_len + 1) as u16;
+
+        core::ptr::write(sep_slot, borrowed_key);
+    }
+
+    unsafe fn borrow_from_right_branch(&mut self, branch: NonNull<u8>, child_idx: usize) {
+        let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
+        let children = parts.children_ptr as *mut *mut u8;
+
+        let child_ptr = *children.add(child_idx);
+        let right_ptr = *children.add(child_idx + 1);
+        let child = NonNull::new_unchecked(child_ptr);
+        let right = NonNull::new_unchecked(right_ptr);
+
+        let child_parts = layout::carve_branch::<K>(child, &self.branch_layout);
+        let right_parts = layout::carve_branch::<K>(right, &self.branch_layout);
+
+        let child_len = (*child_parts.hdr).len as usize;
+        let right_len = (*right_parts.hdr).len as usize;
+
+        let sep_slot = (parts.keys_ptr as *mut K).add(child_idx);
+        let parent_key = core::ptr::read(sep_slot);
+
+        let right_keys = right_parts.keys_ptr as *mut K;
+        let right_children = right_parts.children_ptr as *mut *mut u8;
+        let new_sep = core::ptr::read(right_keys.add(0));
+        let transfer_child = *right_children.add(0);
+
+        let child_keys = child_parts.keys_ptr as *mut K;
+        let child_children = child_parts.children_ptr as *mut *mut u8;
+        core::ptr::write(child_keys.add(child_len), parent_key);
+        *child_children.add(child_len + 1) = transfer_child;
+        (*child_parts.hdr).len = (child_len + 1) as u16;
+
+        if right_len > 1 {
+            core::ptr::copy(right_keys.add(1), right_keys, right_len - 1);
+        }
+        core::ptr::copy(right_children.add(1), right_children, right_len);
+        *right_children.add(right_len) = ptr::null_mut();
+        (*right_parts.hdr).len = (right_len - 1) as u16;
+
+        core::ptr::write(sep_slot, new_sep);
+    }
+
+    unsafe fn merge_branch_with_left(&mut self, branch: NonNull<u8>, child_idx: usize) {
+        let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
+        let keys = parts.keys_ptr as *mut K;
+        let children = parts.children_ptr as *mut *mut u8;
+
+        let left_ptr = *children.add(child_idx - 1);
+        let child_ptr = *children.add(child_idx);
+        let left = NonNull::new_unchecked(left_ptr);
+        let child = NonNull::new_unchecked(child_ptr);
+
+        let left_parts = layout::carve_branch::<K>(left, &self.branch_layout);
+        let child_parts = layout::carve_branch::<K>(child, &self.branch_layout);
+
+        let left_len = (*left_parts.hdr).len as usize;
+        let child_len = (*child_parts.hdr).len as usize;
+
+        let sep_slot = keys.add(child_idx - 1);
+        let sep_key = core::ptr::read(sep_slot);
+
+        let left_keys = left_parts.keys_ptr as *mut K;
+        let left_children = left_parts.children_ptr as *mut *mut u8;
+        let child_keys = child_parts.keys_ptr as *mut K;
+        let child_children = child_parts.children_ptr as *mut *mut u8;
+
+        core::ptr::write(left_keys.add(left_len), sep_key);
+        for i in 0..child_len {
+            core::ptr::write(
+                left_keys.add(left_len + 1 + i),
+                core::ptr::read(child_keys.add(i)),
+            );
+        }
+        for i in 0..=child_len {
+            *left_children.add(left_len + 1 + i) = *child_children.add(i);
+        }
+        (*left_parts.hdr).len = (left_len + 1 + child_len) as u16;
+        (*child_parts.hdr).len = 0;
+
+        self.free_branch_node(child);
+        self.collapse_branch_entry(branch, child_idx - 1);
+    }
+
+    unsafe fn merge_branch_with_right(&mut self, branch: NonNull<u8>, child_idx: usize) {
+        let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
+        let keys = parts.keys_ptr as *mut K;
+        let children = parts.children_ptr as *mut *mut u8;
+
+        let child_ptr = *children.add(child_idx);
+        let right_ptr = *children.add(child_idx + 1);
+        let child = NonNull::new_unchecked(child_ptr);
+        let right = NonNull::new_unchecked(right_ptr);
+
+        let child_parts = layout::carve_branch::<K>(child, &self.branch_layout);
+        let right_parts = layout::carve_branch::<K>(right, &self.branch_layout);
+
+        let child_len = (*child_parts.hdr).len as usize;
+        let right_len = (*right_parts.hdr).len as usize;
+
+        let sep_slot = keys.add(child_idx);
+        let sep_key = core::ptr::read(sep_slot);
+
+        let child_keys = child_parts.keys_ptr as *mut K;
+        let child_children = child_parts.children_ptr as *mut *mut u8;
+        let right_keys = right_parts.keys_ptr as *mut K;
+        let right_children = right_parts.children_ptr as *mut *mut u8;
+
+        core::ptr::write(child_keys.add(child_len), sep_key);
+        for i in 0..right_len {
+            core::ptr::write(
+                child_keys.add(child_len + 1 + i),
+                core::ptr::read(right_keys.add(i)),
+            );
+        }
+        for i in 0..=right_len {
+            *child_children.add(child_len + 1 + i) = *right_children.add(i);
+        }
+        (*child_parts.hdr).len = (child_len + 1 + right_len) as u16;
+        (*right_parts.hdr).len = 0;
+
+        self.free_branch_node(right);
+        self.collapse_branch_entry(branch, child_idx);
+    }
+
+    unsafe fn free_branch_node(&mut self, node: NonNull<u8>) {
+        dealloc_raw(node, self.branch_layout.bytes, self.branch_layout.max_align);
+    }
+
+    unsafe fn collapse_branch_entry(&mut self, branch: NonNull<u8>, key_idx: usize) {
+        let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
+        let len = (*parts.hdr).len as usize;
+        if key_idx >= len {
+            return;
+        }
+
+        let keys = parts.keys_ptr as *mut K;
+        let children = parts.children_ptr as *mut *mut u8;
+
+        if key_idx < len - 1 {
+            core::ptr::copy(keys.add(key_idx + 1), keys.add(key_idx), len - key_idx - 1);
+        }
+        core::ptr::copy(
+            children.add(key_idx + 2),
+            children.add(key_idx + 1),
+            len - key_idx,
+        );
+        *children.add(len) = ptr::null_mut();
+        (*parts.hdr).len = (len - 1) as u16;
+    }
+
+    unsafe fn borrow_from_left_leaf(&mut self, branch: NonNull<u8>, child_idx: usize) {
+        let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
+        let keys = parts.keys_ptr as *mut K;
+        let children = parts.children_ptr as *mut *mut u8;
+
+        let left_ptr = *children.add(child_idx - 1);
+        let child_ptr = *children.add(child_idx);
+        let left = NonNull::new_unchecked(left_ptr);
+        let child = NonNull::new_unchecked(child_ptr);
+
+        let left_parts = layout::carve_leaf::<K, V>(left, &self.leaf_layout);
+        let child_parts = layout::carve_leaf::<K, V>(child, &self.leaf_layout);
+
+        let left_len = (*left_parts.hdr).len as usize;
+        let child_len = (*child_parts.hdr).len as usize;
+
+        let (key, val) = self.read_kv_at(
+            left_parts.keys_ptr as *const K,
+            left_parts.vals_ptr as *const V,
+            left_len - 1,
+        );
+        (*left_parts.hdr).len = (left_len - 1) as u16;
+
+        self.shift_right(
+            child_parts.keys_ptr as *mut K,
+            child_parts.vals_ptr as *mut V,
+            0,
+            child_len,
+        );
+        self.write_kv_at(
+            child_parts.keys_ptr as *mut K,
+            child_parts.vals_ptr as *mut V,
+            0,
+            key,
+            val,
+        );
+        (*child_parts.hdr).len = (child_len + 1) as u16;
+
+        let new_sep = self.key_clone_at(child_parts.keys_ptr as *const K, 0);
+        let sep_slot = keys.add(child_idx - 1);
+        let old_sep = core::ptr::read(sep_slot);
+        drop(old_sep);
+        core::ptr::write(sep_slot, new_sep);
+    }
+
+    unsafe fn borrow_from_right_leaf(&mut self, branch: NonNull<u8>, child_idx: usize) {
+        let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
+        let keys = parts.keys_ptr as *mut K;
+        let children = parts.children_ptr as *mut *mut u8;
+
+        let child_ptr = *children.add(child_idx);
+        let right_ptr = *children.add(child_idx + 1);
+        let child = NonNull::new_unchecked(child_ptr);
+        let right = NonNull::new_unchecked(right_ptr);
+
+        let child_parts = layout::carve_leaf::<K, V>(child, &self.leaf_layout);
+        let right_parts = layout::carve_leaf::<K, V>(right, &self.leaf_layout);
+
+        let child_len = (*child_parts.hdr).len as usize;
+        let right_len = (*right_parts.hdr).len as usize;
+
+        let (key, val) = self.read_kv_at(
+            right_parts.keys_ptr as *const K,
+            right_parts.vals_ptr as *const V,
+            0,
+        );
+
+        self.write_kv_at(
+            child_parts.keys_ptr as *mut K,
+            child_parts.vals_ptr as *mut V,
+            child_len,
+            key,
+            val,
+        );
+        (*child_parts.hdr).len = (child_len + 1) as u16;
+
+        if right_len > 1 {
+            core::ptr::copy(
+                right_parts.keys_ptr.add(1) as *const K,
+                right_parts.keys_ptr as *mut K,
+                right_len - 1,
+            );
+            core::ptr::copy(
+                right_parts.vals_ptr.add(1) as *const V,
+                right_parts.vals_ptr as *mut V,
+                right_len - 1,
+            );
+            core::ptr::drop_in_place(right_parts.keys_ptr.add(right_len - 1) as *mut K);
+            core::ptr::drop_in_place(right_parts.vals_ptr.add(right_len - 1) as *mut V);
+        }
+        (*right_parts.hdr).len = (right_len - 1) as u16;
+
+        let new_sep = self.key_clone_at(right_parts.keys_ptr as *const K, 0);
+        let sep_slot = keys.add(child_idx);
+        let old_sep = core::ptr::read(sep_slot);
+        drop(old_sep);
+        core::ptr::write(sep_slot, new_sep);
+    }
+
+    unsafe fn merge_leaf_with_left(&mut self, branch: NonNull<u8>, child_idx: usize) {
+        let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
+        let children = parts.children_ptr as *mut *mut u8;
+
+        let left_ptr = *children.add(child_idx - 1);
+        let child_ptr = *children.add(child_idx);
+        let left = NonNull::new_unchecked(left_ptr);
+        let child = NonNull::new_unchecked(child_ptr);
+
+        self.merge_leaf_into(left, child);
+        self.free_leaf_node(child);
+        self.remove_branch_entry(branch, child_idx - 1);
+    }
+
+    unsafe fn merge_leaf_with_right(&mut self, branch: NonNull<u8>, child_idx: usize) {
+        let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
+        let children = parts.children_ptr as *mut *mut u8;
+
+        let child_ptr = *children.add(child_idx);
+        let right_ptr = *children.add(child_idx + 1);
+        let child = NonNull::new_unchecked(child_ptr);
+        let right = NonNull::new_unchecked(right_ptr);
+
+        self.merge_leaf_into(child, right);
+        self.free_leaf_node(right);
+        self.remove_branch_entry(branch, child_idx);
+    }
+
+    unsafe fn remove_branch_entry(&mut self, branch: NonNull<u8>, key_idx: usize) {
+        let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
+        let len = (*parts.hdr).len as usize;
+        if key_idx >= len {
+            return;
+        }
+
+        let keys = parts.keys_ptr as *mut K;
+        let children = parts.children_ptr as *mut *mut u8;
+
+        let removed = core::ptr::read(keys.add(key_idx));
+        drop(removed);
+        if key_idx < len - 1 {
+            core::ptr::copy(keys.add(key_idx + 1), keys.add(key_idx), len - key_idx - 1);
+        }
+
+        core::ptr::copy(
+            children.add(key_idx + 2),
+            children.add(key_idx + 1),
+            len - key_idx,
+        );
+        *children.add(len) = ptr::null_mut();
+        (*parts.hdr).len = (len - 1) as u16;
+    }
+
     unsafe fn remove_rec(&mut self, node: NonNull<u8>, key: &K) -> Option<V> {
         let hdr = &*(node.as_ptr() as *const NodeHdr);
         match hdr.tag {
             NodeTag::Leaf => self.leaf_remove(node, key),
             NodeTag::Branch => {
-                let (child, _) = self.child_for_key(node, key)?;
-                self.remove_rec(child, key)
+                let (child, idx) = self.child_for_key(node, key)?;
+                let result = self.remove_rec(child, key);
+                if result.is_some() {
+                    self.fix_branch_child(node, idx);
+                }
+                result
             }
         }
     }
