@@ -5,7 +5,7 @@ use std::time::Duration;
 use std::time::Instant;
 
 use bplustree::BPlusTreeMap;
-use old_bplustree::BPlusTreeMap as OldBPlusTreeMap;
+// use old_bplustree::BPlusTreeMap as OldBPlusTreeMap;
 
 fn parse_arg<T: std::str::FromStr>(i: usize, default: T) -> T {
     env::args()
@@ -23,7 +23,7 @@ fn main() {
     let lookup_keys: Vec<u64> = dataset.iter().map(|(k, _)| *k).collect();
 
     let current = bench_current(&dataset, &lookup_keys, cap);
-    let previous = bench_previous(&dataset, &lookup_keys, cap);
+    // let previous = bench_previous(&dataset, &lookup_keys, cap);
     let std_map = bench_std(&dataset, &lookup_keys);
 
     println!("\n=== Insert/Get Benchmark ===");
@@ -32,7 +32,7 @@ fn main() {
         "{:<18} {:>12} {:>15} {:>12} {:>15}",
         "target", "insert(s)", "insert Mops", "get(s)", "get Mops"
     );
-    for result in [current, previous, std_map] {
+    for result in [current, /* previous, */ std_map] {
         println!(
             "{:<18} {:>12.3} {:>15.2} {:>12.3} {:>15.2}",
             result.label,
@@ -61,16 +61,16 @@ fn bench_current(dataset: &[(u64, u64)], lookups: &[u64], cap: usize) -> BenchRe
     }
 }
 
-fn bench_previous(dataset: &[(u64, u64)], lookups: &[u64], cap: usize) -> BenchResult {
-    let mut map = OldBPlusTreeMap::new(cap).expect("previous new");
-    let insert = time_insert(&mut map, dataset);
-    let get = time_get(|k| map.get(k), lookups);
-    BenchResult {
-        label: "bplustree-old",
-        insert,
-        get,
-    }
-}
+// fn bench_previous(dataset: &[(u64, u64)], lookups: &[u64], cap: usize) -> BenchResult {
+//     let mut map = OldBPlusTreeMap::new(cap).expect("previous new");
+//     let insert = time_insert(&mut map, dataset);
+//     let get = time_get(|k| map.get(k), lookups);
+//     BenchResult {
+//         label: "bplustree-old",
+//         insert,
+//         get,
+//     }
+// }
 
 fn bench_std(dataset: &[(u64, u64)], lookups: &[u64]) -> BenchResult {
     let mut map = BTreeMap::new();
@@ -130,11 +130,11 @@ impl InsertBenchmark for BPlusTreeMap<u64, u64> {
     }
 }
 
-impl InsertBenchmark for OldBPlusTreeMap<u64, u64> {
-    fn insert(&mut self, key: u64, value: u64) {
-        Self::insert(self, key, value);
-    }
-}
+// impl InsertBenchmark for OldBPlusTreeMap<u64, u64> {
+//     fn insert(&mut self, key: u64, value: u64) {
+//         Self::insert(self, key, value);
+//     }
+// }
 
 impl InsertBenchmark for BTreeMap<u64, u64> {
     fn insert(&mut self, key: u64, value: u64) {

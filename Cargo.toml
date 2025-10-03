@@ -9,7 +9,7 @@ license = "MIT"
 path = "src/lib.rs"
 
 [dependencies]
-old_bplustree = { package = "bplustree", path = "vendor/BPlusTree3/rust" }
+# old_bplustree = { package = "bplustree", path = "vendor/BPlusTree3/rust" }
 
 [features]
 default = ["std", "compat_test_api"]

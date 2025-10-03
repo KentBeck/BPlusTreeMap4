@@ -381,22 +381,16 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
     #[inline]
     pub(crate) fn min_leaf_len(&self) -> usize {
         let cap = self.leaf_layout.cap as usize;
-        if cap == 0 {
-            0
-        } else {
-            (cap + 1) / 2
-        }
+        cap / 2
     }
 
     #[inline]
     pub(crate) fn min_branch_len(&self) -> usize {
         let cap = self.branch_layout.cap as usize;
-        if cap == 0 {
-            0
-        } else if cap <= 2 {
+        if cap <= 2 {
             1
         } else {
-            (cap + 1) / 2
+            cap / 2
         }
     }
 }

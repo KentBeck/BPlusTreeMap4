@@ -71,10 +71,10 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
                             self.make_leaf_root(child);
                         }
                         self.root = Some(child);
-                        dealloc_raw(root, self.branch_layout.bytes, self.branch_layout.max_align);
+                        self.free_branch_node(root);
                     } else {
                         self.root = None;
-                        dealloc_raw(root, self.branch_layout.bytes, self.branch_layout.max_align);
+                        self.free_branch_node(root);
                     }
                 }
             }
@@ -96,6 +96,7 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
             None => ptr::null_mut(),
         };
 
+        // Unlink from sibling chain
         if !prev.is_null() {
             let prev_leaf = NonNull::new_unchecked(prev);
             let prev_parts = layout::carve_leaf::<K, V>(prev_leaf, &self.leaf_layout);
@@ -114,6 +115,12 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         if let Some(prev_ptr) = parts.prev_ptr {
             *prev_ptr = ptr::null_mut();
         }
+
+        // NOTE: We do NOT drop keys/values here because:
+        // 1. Merge operations set len=0 after moving items out
+        // 2. Items should already be dropped by the time we free the node
+        // 3. Dropping here would cause double-free
+        // The only exception is in free_tree_no_drop which handles cleanup differently
 
         dealloc_raw(leaf, self.leaf_layout.bytes, self.leaf_layout.max_align);
     }
@@ -424,6 +431,14 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
     }
 
     unsafe fn free_branch_node(&mut self, node: NonNull<u8>) {
+        let parts = layout::carve_branch::<K>(node, &self.branch_layout);
+        let len = (*parts.hdr).len as usize;
+        
+        // Drop all separator keys before deallocating
+        for i in 0..len {
+            ptr::drop_in_place((parts.keys_ptr as *mut K).add(i));
+        }
+        
         dealloc_raw(node, self.branch_layout.bytes, self.branch_layout.max_align);
     }
 
@@ -525,7 +540,9 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         );
         (*child_parts.hdr).len = (child_len + 1) as u16;
 
+        // Shift remaining items in right leaf and clean up the duplicate at the end
         if right_len > 1 {
+            // Copy items [1..right_len) to positions [0..right_len-1)
             core::ptr::copy(
                 right_parts.keys_ptr.add(1) as *const K,
                 right_parts.keys_ptr as *mut K,
@@ -536,9 +553,11 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
                 right_parts.vals_ptr as *mut V,
                 right_len - 1,
             );
+            // Drop the duplicate at position right_len-1
             core::ptr::drop_in_place(right_parts.keys_ptr.add(right_len - 1) as *mut K);
             core::ptr::drop_in_place(right_parts.vals_ptr.add(right_len - 1) as *mut V);
         }
+        // If right_len == 1, we've already transferred the only item, so nothing to drop
         (*right_parts.hdr).len = (right_len - 1) as u16;
 
         let new_sep = self.key_clone_at(right_parts.keys_ptr as *const K, 0);
@@ -622,8 +641,11 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
         let idx = keys.binary_search(key).ok()?;
 
+        // Read the key and value (transferring ownership)
+        let removed_key = core::ptr::read((parts.keys_ptr as *const K).add(idx));
         let value = core::ptr::read(parts.vals_ptr.add(idx) as *const V);
 
+        // Shift remaining elements
         if idx < len - 1 {
             core::ptr::copy(
                 parts.keys_ptr.add(idx + 1) as *const K,
@@ -639,6 +661,10 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
 
         (*parts.hdr).len = (len - 1) as u16;
         self.len_count -= 1;
+        
+        // Drop the removed key (value is returned to caller)
+        drop(removed_key);
+        
         Some(value)
     }
 
