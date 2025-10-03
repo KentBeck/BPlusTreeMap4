@@ -1707,8 +1707,6 @@ fn test_delete_all_but_one() {
         tree.insert(i, format!("value_{}", i));
     }
     if !tree.check_invariants() {
-        println!("Final tree structure:");
-        tree.print_node_chain();
         panic!("Final invariants check failed");
     }
 
@@ -1716,8 +1714,6 @@ fn test_delete_all_but_one() {
     for i in 0..49 {
         tree.remove(&i);
         if !tree.check_invariants() {
-            println!("Invariants failed after removing {}", i);
-            tree.print_node_chain();
             panic!("Invariants violated after removing {}", i);
         }
     }

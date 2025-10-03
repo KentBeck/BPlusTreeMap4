@@ -62,16 +62,14 @@ fn fuzz_test_bplustree() {
                     println!("BPlusTree returned: {:?}", bplus_value);
                     println!("BTreeMap returned: {:?}", btree_value);
                     println!(
-                        "BPlusTree has {} nodes with sizes: {:?}",
+                        "BPlusTree has {} nodes",
                         bplustree.leaf_count(),
-                        bplustree.leaf_sizes()
                     );
                     println!("Operations so far:");
                     for op in &operations {
                         println!("  {}", op);
                     }
                     println!("Tree structure:");
-                    bplustree.print_node_chain();
                     panic!("Get result mismatch!");
                 }
             }
@@ -88,13 +86,13 @@ fn fuzz_test_bplustree() {
                 panic!("Length mismatch!");
             }
 
-            // Verify slice/iteration order matches
-            let bplus_slice = bplustree.slice();
+            // Verify iteration order matches
+            let bplus_slice: Vec<_> = bplustree.items().collect();
             let btree_slice: Vec<_> = btree_map.iter().collect();
 
             if bplus_slice.len() != btree_slice.len() {
-                println!("SLICE LENGTH MISMATCH after insert({}, {}):", key, value);
-                println!("BPlusTree slice len: {}", bplus_slice.len());
+                println!("ITERATION LENGTH MISMATCH after insert({}, {}):", key, value);
+                println!("BPlusTree iteration len: {}", bplus_slice.len());
                 println!("BTreeMap slice len: {}", btree_slice.len());
                 println!("Operations so far:");
                 for op in &operations {
@@ -129,10 +127,9 @@ fn fuzz_test_bplustree() {
             // Print progress every 10 insertions
             if key % 10 == 0 {
                 println!(
-                    "  Inserted {} keys, {} nodes, sizes: {:?}",
+                    "  Inserted {} keys, {} nodes",
                     key - 1,
                     bplustree.leaf_count(),
-                    bplustree.leaf_sizes()
                 );
             }
         }
@@ -219,16 +216,14 @@ fn fuzz_test_with_random_keys() {
                     println!("BPlusTree returned: {:?}", bplus_value);
                     println!("BTreeMap returned: {:?}", btree_value);
                     println!(
-                        "BPlusTree has {} nodes with sizes: {:?}",
+                        "BPlusTree has {} nodes",
                         bplustree.leaf_count(),
-                        bplustree.leaf_sizes()
                     );
                     println!("Operations so far:");
                     for op in &operations {
                         println!("  {}", op);
                     }
                     println!("Tree structure:");
-                    bplustree.print_node_chain();
                     panic!("Get result mismatch!");
                 }
             }
@@ -238,10 +233,9 @@ fn fuzz_test_with_random_keys() {
             // Print progress every 20 insertions
             if inserted_keys.len() % 20 == 0 {
                 println!(
-                    "  Inserted {} keys, {} nodes, sizes: {:?}",
+                    "  Inserted {} keys, {} nodes",
                     inserted_keys.len(),
                     bplustree.leaf_count(),
-                    bplustree.leaf_sizes()
                 );
             }
         }
@@ -396,9 +390,8 @@ fn fuzz_test_timed() {
                             println!("BPlusTree returned: {:?}", bplus_value);
                             println!("BTreeMap returned: {:?}", btree_value);
                             println!(
-                                "Tree has {} nodes with sizes: {:?}",
+                                "Tree has {} nodes ",
                                 bplustree.leaf_count(),
-                                bplustree.leaf_sizes()
                             );
                             println!("Recent operations:");
                             for op in operations.iter().rev().take(20) {

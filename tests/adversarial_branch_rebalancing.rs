@@ -42,9 +42,7 @@ fn test_cascading_branch_rebalance_attack() {
 
     // Now the attack: delete keys that will force cascading rebalances
     // Target keys that will make branches underfull
-    println!("Tree structure before attack:");
-    tree.print_node_chain();
-    println!("Leaf sizes: {:?}", tree.leaf_sizes());
+    println!("Tree structure before attack");
 
     // This deletion should trigger a cascade of rebalances
     let attack_key = 0;
@@ -83,8 +81,7 @@ fn test_branch_borrow_from_underfull_sibling_attack() {
         tree.remove(&key);
     }
 
-    println!("Tree before borrow attack:");
-    tree.print_node_chain();
+    println!("Tree before borrow attack");
 
     // Now delete a key that forces a borrow attempt from a minimum sibling
     println!("\nDeleting key to force borrow from minimum sibling...");
@@ -125,9 +122,7 @@ fn test_branch_merge_with_maximum_keys_attack() {
         }
     }
 
-    println!("Tree before merge attack:");
-    tree.print_node_chain();
-    println!("Leaf sizes: {:?}", tree.leaf_sizes());
+    println!("Tree before merge attack");
 
     // Find and delete a key that will trigger the specific merge
     for i in 0..30 {

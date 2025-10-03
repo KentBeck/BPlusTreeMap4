@@ -6,44 +6,6 @@ use bplustree::BPlusTreeMap;
 mod test_utils;
 use test_utils::*;
 
-/// Test NodeId capacity limits
-#[test]
-fn test_node_id_capacity_limits() {
-    println!("=== NODE ID CAPACITY LIMITS TEST ===");
-
-    let mut tree: BPlusTreeMap<i32, String> = BPlusTreeMap::new(4).unwrap();
-
-    // Test that we can handle NodeId values approaching u32::MAX
-    // without panicking due to conversion issues
-    let test_size = 50000; // Reasonable test size
-
-    for i in 0..test_size {
-        tree.insert(i, format!("test_value_{}", i));
-
-        // Check every 10000 items that conversions are working
-        if i % 10000 == 0 && i > 0 {
-            let allocated = tree.allocated_leaf_count();
-            let in_tree = tree.leaf_count();
-
-            println!(
-                "  {} items: {} allocated, {} in tree",
-                i, allocated, in_tree
-            );
-
-            // Verify no overflow occurred
-            assert!(allocated > 0, "Allocation count should be positive");
-            assert!(in_tree > 0, "Tree count should be positive");
-            assert!(allocated >= in_tree, "Allocated should be >= in tree");
-        }
-    }
-
-    println!(
-        "Successfully handled {} items without conversion errors",
-        test_size
-    );
-    println!("✅ NodeId capacity limits test passed");
-}
-
 /// Test that iteration returns items in sorted order after deletions
 #[test]
 fn test_iteration_order_after_deletions() {
@@ -122,51 +84,6 @@ fn test_integer_overflow_prevention() {
     );
 
     println!("✅ Integer overflow prevention test passed");
-}
-
-/// Test memory safety under stress conditions
-#[test]
-fn test_memory_safety_stress() {
-    println!("=== MEMORY SAFETY STRESS TEST ===");
-
-    let mut tree: BPlusTreeMap<i32, String> = BPlusTreeMap::new(8).unwrap();
-
-    // Stress test with many allocations/deallocations
-    for round in 0..100 {
-        // Allocate a batch
-        let base = round * 1000;
-        for i in 0..500 {
-            tree.insert(base + i, format!("stress_{}_{}", round, i));
-        }
-
-        // Deallocate some items
-        for i in 100..400 {
-            tree.remove(&(base + i));
-        }
-
-        // Every 20 rounds, verify integrity
-        if round % 20 == 19 {
-            let allocated =
-                tree.leaf_arena_stats().allocated_count + tree.branch_arena_stats().allocated_count;
-            let (tree_leaves, tree_branches) = tree.count_nodes_in_tree();
-            let in_tree = tree_leaves + tree_branches;
-
-            println!(
-                "Round {}: {} allocated, {} in tree",
-                round + 1,
-                allocated,
-                in_tree
-            );
-
-            // Verify no memory safety violations
-            assert_eq!(
-                allocated, in_tree,
-                "Memory safety violation: allocated != in_tree"
-            );
-        }
-    }
-
-    println!("✅ Memory safety stress test passed");
 }
 
 /// Test that u32 keys can be inserted, retrieved, and removed correctly

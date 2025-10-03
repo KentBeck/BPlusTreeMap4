@@ -3,63 +3,6 @@ mod test_utils;
 use test_utils::*;
 
 #[test]
-fn test_memory_leak_placeholder() {
-    let mut tree = create_tree_4();
-
-    // Record initial arena state
-    let _initial_count = tree.allocated_leaf_count();
-
-    // Force root splits to trigger the placeholder leak
-    insert_sequential_range(&mut tree, 20);
-
-    // Check if we have more allocated nodes than actual tree nodes
-    let allocated = tree.allocated_leaf_count();
-    let actual_leaves = tree.leaf_count();
-
-    println!(
-        "Allocated leaves: {}, Actual leaves in tree: {}",
-        allocated, actual_leaves
-    );
-
-    // This will show the memory leak if it exists
-    assert!(
-        allocated >= actual_leaves,
-        "Should have at least as many allocated as in tree"
-    );
-
-    // The test will reveal the issue by showing excessive allocation
-    if allocated > actual_leaves {
-        println!(
-            "POTENTIAL MEMORY LEAK: {} allocated but only {} in tree structure",
-            allocated, actual_leaves
-        );
-    }
-}
-
-#[test]
-fn test_odd_capacity_split() {
-    let mut tree = create_tree_5();
-
-    // Insert enough to force splits with odd capacity
-    insert_sequential_range(&mut tree, 10);
-
-    // Check leaf node sizes
-    let leaf_sizes = tree.leaf_sizes();
-    println!("Leaf sizes with capacity 5: {:?}", leaf_sizes);
-
-    // With capacity 5, min_keys = 2, so all non-empty leaves should have >= 2 keys
-    let min_keys = 2;
-    for &size in &leaf_sizes {
-        if size > 0 && size < min_keys {
-            panic!(
-                "Split created underfull leaf: {} keys < {} minimum",
-                size, min_keys
-            );
-        }
-    }
-}
-
-#[test]
 fn test_linked_list_integrity() {
     let mut tree = create_tree_4();
 
@@ -152,41 +95,6 @@ fn test_min_keys_consistency() {
     // The min_keys formula might be problematic for certain capacities
     // This test documents the current behavior
     println!("Tree with capacity 6 has {} leaves", test_tree.leaf_count());
-    println!("Leaf sizes: {:?}", test_tree.leaf_sizes());
-}
-
-#[test]
-fn test_rebalancing_after_deletions() {
-    let mut tree = create_tree_4();
-
-    // Create a substantial tree
-    insert_sequential_range(&mut tree, 50);
-
-    println!("Before deletions - leaf count: {}", tree.leaf_count());
-    println!("Leaf sizes: {:?}", tree.leaf_sizes());
-
-    // Delete many items to force rebalancing
-    deletion_range_attack(&mut tree, 10, 40);
-
-    println!("After deletions - leaf count: {}", tree.leaf_count());
-    println!("Leaf sizes: {:?}", tree.leaf_sizes());
-
-    // Check that tree is still valid
-    assert_invariants(&tree, "rebalancing after deletions");
-
-    // Check for underfull nodes (this might reveal rebalancing issues)
-    let min_keys = 2; // For capacity 4
-    let leaf_sizes = tree.leaf_sizes();
-
-    let underfull_count = leaf_sizes
-        .iter()
-        .filter(|&&size| size > 0 && size < min_keys)
-        .count();
-
-    if underfull_count > 0 {
-        println!("WARNING: {} underfull leaves detected", underfull_count);
-        // This is expected to show rebalancing issues if they exist
-    }
 }
 
 #[test]

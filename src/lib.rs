@@ -132,7 +132,6 @@ impl<K, V> BPlusTreeMap<K, V> {
 
 use alloc::format;
 use alloc::string::String;
-use alloc::vec::Vec;
 use core::fmt;
 
 pub const NULL_NODE: u32 = u32::MAX;
@@ -224,22 +223,6 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         self.len_count = 0;
     }
 
-    pub fn allocated_leaf_count(&self) -> usize {
-        0
-    }
-
-    pub fn free_leaf_count(&self) -> usize {
-        0
-    }
-
-    pub fn leaf_sizes(&self) -> Vec<usize> {
-        Vec::new()
-    }
-
-    pub fn count_nodes_in_tree(&self) -> (usize, usize) {
-        (0, 0)
-    }
-
     #[cfg(feature = "compat_test_api")]
     pub fn allocate_leaf(&mut self, _node: LeafNodeCompat<K, V>) -> u32 {
         0
@@ -269,13 +252,6 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
     pub fn set_leaf_next(&mut self, _id: u32, _next: u32) -> bool {
         true
     }
-}
-
-#[derive(Debug, Copy, Clone)]
-#[cfg(feature = "compat_test_api")]
-pub struct ArenaStats {
-    pub free_count: usize,
-    pub allocated_count: usize,
 }
 
 // Minimal leaf node compatibility type used by arena-ish tests
@@ -413,13 +389,6 @@ pub type LeafNode<K, V> = LeafNodeCompat<K, V>;
 // Extra convenience/debug API stubs used in tests
 #[cfg(feature = "compat_test_api")]
 impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
-    pub fn print_node_chain(&self) {}
-    pub fn leaf_utilization(&self) -> f64 {
-        0.0
-    }
-    pub fn slice(&self) -> Vec<(&K, &V)> {
-        Vec::new()
-    }
     pub fn validate(&self) -> BTreeResult<()> {
         Ok(())
     }

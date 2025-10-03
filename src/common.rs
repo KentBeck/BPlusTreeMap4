@@ -3,7 +3,7 @@ use alloc::string::String;
 use core::ptr::NonNull;
 
 use crate::layout;
-use crate::{ArenaStats, BPlusTreeMap, NodeHdr, NodeTag};
+use crate::{BPlusTreeMap, NodeHdr, NodeTag};
 
 pub(crate) struct ValidationState<K> {
     pub(crate) total_items: usize,
@@ -391,23 +391,6 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
             1
         } else {
             cap / 2
-        }
-    }
-}
-
-#[cfg(feature = "compat_test_api")]
-impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
-    pub fn leaf_arena_stats(&self) -> ArenaStats {
-        ArenaStats {
-            free_count: 0,
-            allocated_count: 0,
-        }
-    }
-
-    pub fn branch_arena_stats(&self) -> ArenaStats {
-        ArenaStats {
-            free_count: 0,
-            allocated_count: 0,
         }
     }
 }

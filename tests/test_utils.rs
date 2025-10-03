@@ -232,28 +232,6 @@ where
     }
 }
 
-/// Standard arena exhaustion attack pattern
-pub fn arena_exhaustion_attack(tree: &mut BPlusTreeMap<i32, String>, cycle: usize) {
-    let cycle_i32 = cycle as i32;
-
-    // Fill tree to create many nodes
-    for i in 0..100 {
-        tree.insert(cycle_i32 * 1000 + i, format!("v{}-{}", cycle, i));
-    }
-
-    // Delete most items to free nodes
-    for i in 0..95 {
-        tree.remove(&(cycle_i32 * 1000 + i));
-    }
-
-    println!(
-        "Cycle {}: Free leaves={}, Free branches={}",
-        cycle,
-        tree.free_leaf_count(),
-        tree.branch_arena_stats().free_count
-    );
-}
-
 /// Standard fragmentation attack pattern
 pub fn fragmentation_attack(tree: &mut BPlusTreeMap<i32, String>, base_key: i32) {
     // Insert in a pattern that creates and frees nodes in specific order
@@ -424,38 +402,6 @@ pub fn execute_interleaved_ops(
         // Check invariants after each operation
         assert_invariants(tree, &format!("after thread2 op {}", i));
     }
-}
-
-// ============================================================================
-// DEBUGGING AND STATISTICS
-// ============================================================================
-
-/// Print tree statistics for debugging
-pub fn print_tree_stats(tree: &BPlusTreeMap<i32, String>, label: &str) {
-    let leaf_stats = tree.leaf_arena_stats();
-    let branch_stats = tree.branch_arena_stats();
-    println!(
-        "{}: {} items, Free leaves={}, Free branches={}",
-        label,
-        tree.len(),
-        leaf_stats.free_count,
-        branch_stats.free_count
-    );
-    println!("Leaf sizes: {:?}", tree.leaf_sizes());
-}
-
-/// Print tree statistics for integer trees
-pub fn print_tree_stats_int(tree: &BPlusTreeMap<i32, i32>, label: &str) {
-    let leaf_stats = tree.leaf_arena_stats();
-    let branch_stats = tree.branch_arena_stats();
-    println!(
-        "{}: {} items, Free leaves={}, Free branches={}",
-        label,
-        tree.len(),
-        leaf_stats.free_count,
-        branch_stats.free_count
-    );
-    println!("Leaf sizes: {:?}", tree.leaf_sizes());
 }
 
 // ============================================================================
