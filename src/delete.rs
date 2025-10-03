@@ -452,9 +452,14 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         let keys = parts.keys_ptr as *mut K;
         let children = parts.children_ptr as *mut *mut u8;
 
+        // Note: The key at key_idx has already been ptr::read out by the caller,
+        // so we must not drop it here. We just shift the remaining keys.
         if key_idx < len - 1 {
             core::ptr::copy(keys.add(key_idx + 1), keys.add(key_idx), len - key_idx - 1);
         }
+        // After shifting, the last key slot (at len-1) now contains a duplicate.
+        // We must not drop it, so we'll rely on the length being decremented.
+        
         core::ptr::copy(
             children.add(key_idx + 2),
             children.add(key_idx + 1),
