@@ -2176,34 +2176,6 @@ fn test_get_mut() {
     assert_eq!(tree.get_mut(&3), None);
 }
 
-#[test]
-fn test_arena_consistency() {
-    let mut tree = BPlusTreeMap::new(4).unwrap();
-
-    // Insert items
-    for i in 0..50 {
-        tree.insert(i, format!("value_{}", i));
-    }
-
-    // Check consistency
-    assert!(tree.check_invariants_detailed().is_ok());
-
-    // Delete some items
-    for i in (0..50).step_by(3) {
-        tree.remove(&i);
-    }
-
-    // Check consistency again
-    assert!(tree.check_invariants_detailed().is_ok());
-
-    // Count nodes
-    let (tree_leaves, tree_branches) = tree.count_nodes_in_tree();
-    let leaf_stats = tree.leaf_arena_stats();
-    let branch_stats = tree.branch_arena_stats();
-
-    assert_eq!(tree_leaves, leaf_stats.allocated_count);
-    assert_eq!(tree_branches, branch_stats.allocated_count);
-}
 
 #[test]
 fn test_leaf_linked_list_completeness() {

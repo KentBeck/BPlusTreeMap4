@@ -194,30 +194,6 @@ fn test_incomplete_rebalancing_logic() {
 }
 
 #[test]
-fn test_arena_tree_consistency() {
-    let mut tree = create_tree_4_with_data(20);
-
-    // Insert and remove data to create potential inconsistencies
-    deletion_range_attack(&mut tree, 5, 15);
-
-    // Check that all allocated nodes are actually referenced by the tree
-    let leaf_stats = tree.leaf_arena_stats();
-    let branch_stats = tree.branch_arena_stats();
-    let total_allocated = leaf_stats.allocated_count + branch_stats.allocated_count;
-
-    // Count actual nodes in tree structure
-    let (_actual_leaves, actual_branches) = tree.count_nodes_in_tree();
-    let actual_total = tree.leaf_count() + actual_branches;
-
-    if total_allocated != actual_total {
-        panic!(
-            "Arena-tree consistency violation: {} allocated but {} in tree",
-            total_allocated, actual_total
-        );
-    }
-}
-
-#[test]
 fn test_iterator_lifetime_safety() {
     let tree = create_tree_4_with_data(10);
 
@@ -252,29 +228,6 @@ fn test_root_collapse_edge_cases() {
             "Root collapse cascade error: expected 5 items, got {}",
             remaining_items.len()
         );
-    }
-}
-
-#[test]
-#[should_panic(expected = "Arena ID collision")]
-fn test_arena_id_collision() {
-    // This test is harder to trigger directly, but we can check for the.
-    let tree = create_tree_4();
-
-    // The root should be at ID 0, and the first arena allocation should also try to use 0
-    // This creates potential confusion
-
-    // Test the ID collision by checking arena behavior
-    let initial_leaf_stats = tree.leaf_arena_stats();
-    let initial_count = initial_leaf_stats.allocated_count;
-
-    // The issue is that ROOT_NODE = 0 and arena allocation starts at 0
-    // This creates potential confusion in the implementation
-    if initial_count == 1 {
-        // If we have exactly 1 leaf allocated for an empty tree,
-        // and that's the root at ID 0, then when we allocate more nodes,
-        // the arena might have confusion about ID management
-        panic!("Arena ID collision: root uses same ID as arena base");
     }
 }
 

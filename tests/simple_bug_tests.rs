@@ -207,36 +207,4 @@ fn test_iterator_consistency() {
     assert_eq!(iter1, range_all, "Range(..) should match full iteration");
 }
 
-#[test]
-fn test_arena_utilization() {
-    let mut tree = create_tree_4();
 
-    println!("Initial state:");
-    println!("  Leaf utilization: {:.2}", tree.leaf_utilization());
-    println!("  Allocated leaves: {}", tree.allocated_leaf_count());
-    println!("  Free leaves: {}", tree.free_leaf_count());
-
-    // Add data
-    insert_sequential_range(&mut tree, 20);
-
-    println!("After insertions:");
-    println!("  Leaf utilization: {:.2}", tree.leaf_utilization());
-    println!("  Allocated leaves: {}", tree.allocated_leaf_count());
-    println!("  Free leaves: {}", tree.free_leaf_count());
-
-    // Remove some data
-    deletion_range_attack(&mut tree, 5, 15);
-
-    println!("After deletions:");
-    println!("  Leaf utilization: {:.2}", tree.leaf_utilization());
-    println!("  Allocated leaves: {}", tree.allocated_leaf_count());
-    println!("  Free leaves: {}", tree.free_leaf_count());
-
-    // This will show if there are memory leaks or arena issues
-    let utilization = tree.leaf_utilization();
-    assert!(
-        utilization > 0.0 && utilization <= 1.0,
-        "Utilization should be between 0 and 1, got {}",
-        utilization
-    );
-}

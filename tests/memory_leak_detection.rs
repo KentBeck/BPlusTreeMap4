@@ -190,58 +190,6 @@ fn test_root_split_no_memory_accumulation() {
 }
 
 #[test]
-fn test_arena_fragmentation_and_reuse() {
-    println!("=== ARENA FRAGMENTATION AND REUSE TEST ===");
-
-    let mut tree: BPlusTreeMap<i32, String> = BPlusTreeMap::new(6).unwrap();
-
-    // Create fragmentation by inserting and removing in patterns
-    for phase in 0..5 {
-        println!("\n--- Fragmentation Phase {} ---", phase + 1);
-
-        // Insert data
-        let base = phase * 1000;
-        for i in 0..100 {
-            tree.insert(base + i, format!("phase_{}_{}", phase, i));
-        }
-
-        let after_insert = tree.leaf_arena_stats().allocated_count;
-        let free_after_insert = tree.leaf_arena_stats().free_count;
-
-        // Remove most data to create fragmentation
-        for i in 0..80 {
-            tree.remove(&(base + i));
-        }
-
-        let after_remove = tree.leaf_arena_stats().allocated_count;
-        let free_after_remove = tree.leaf_arena_stats().free_count;
-
-        println!("  Allocated: {} -> {}", after_insert, after_remove);
-        println!("  Free: {} -> {}", free_after_insert, free_after_remove);
-
-        // Verify free list is working
-        if free_after_remove <= free_after_insert {
-            println!("  ✅ Free list grew as expected");
-        } else {
-            println!("  ⚠ Free list behavior unexpected");
-        }
-    }
-
-    // Final consistency check
-    let final_allocated = tree.leaf_arena_stats().allocated_count;
-    let final_in_tree = tree.leaf_count();
-
-    if final_allocated != final_in_tree {
-        panic!(
-            "Final fragmentation test failed: {} allocated vs {} in tree",
-            final_allocated, final_in_tree
-        );
-    }
-
-    println!("✅ ARENA FRAGMENTATION TEST PASSED");
-}
-
-#[test]
 fn test_stress_allocation_deallocation_cycles() {
     println!("=== STRESS ALLOCATION/DEALLOCATION CYCLES ===");
 

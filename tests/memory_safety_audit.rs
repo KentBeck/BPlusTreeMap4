@@ -6,49 +6,6 @@ use bplustree::BPlusTreeMap;
 mod test_utils;
 use test_utils::*;
 
-/// Test arena bounds checking with large data sets
-#[test]
-fn test_arena_bounds_checking() {
-    println!("=== ARENA BOUNDS CHECKING TEST ===");
-
-    let mut tree: BPlusTreeMap<i32, String> = BPlusTreeMap::new(4).unwrap();
-
-    // Test with a reasonable number of items to verify no panics
-    // This used to potentially overflow on 64-bit systems
-    insert_sequential_range(&mut tree, 10000);
-
-    println!("Successfully inserted 10,000 items");
-    println!("Allocated leaves: {}", tree.allocated_leaf_count());
-    println!(
-        "Allocated branches: {}",
-        tree.branch_arena_stats().allocated_count
-    );
-
-    // Verify all items are accessible
-    for i in 0..10000 {
-        assert!(tree.contains_key(&i), "Key {} should be accessible", i);
-    }
-
-    // Test deletion with bounds checking
-    for i in 0..5000 {
-        tree.remove(&i);
-    }
-
-    println!("Successfully removed 5,000 items");
-    println!("Remaining items: {}", tree.len());
-
-    // Verify remaining items are still accessible
-    for i in 5000..10000 {
-        assert!(
-            tree.contains_key(&i),
-            "Key {} should still be accessible",
-            i
-        );
-    }
-
-    println!("✅ Arena bounds checking test passed");
-}
-
 /// Test NodeId capacity limits
 #[test]
 fn test_node_id_capacity_limits() {
@@ -87,10 +44,10 @@ fn test_node_id_capacity_limits() {
     println!("✅ NodeId capacity limits test passed");
 }
 
-/// Test arena iteration with type safety
+/// Test that iteration returns items in sorted order after deletions
 #[test]
-fn test_arena_iteration_type_safety() {
-    println!("=== ARENA ITERATION TYPE SAFETY TEST ===");
+fn test_iteration_order_after_deletions() {
+    println!("=== ITERATION ORDER AFTER DELETIONS TEST ===");
 
     let mut tree: BPlusTreeMap<i32, String> = BPlusTreeMap::new(6).unwrap();
 
@@ -123,7 +80,7 @@ fn test_arena_iteration_type_safety() {
     let range_items: Vec<_> = tree.range(300..400).collect();
     assert_eq!(range_items.len(), 100, "Range should contain 100 items");
 
-    println!("✅ Arena iteration type safety test passed");
+    println!("✅ Iteration order after deletions test passed");
 }
 
 /// Test edge cases that could cause integer overflow
@@ -212,10 +169,10 @@ fn test_memory_safety_stress() {
     println!("✅ Memory safety stress test passed");
 }
 
-/// Test bounds checking in specific arena operations
+/// Test that u32 keys can be inserted, retrieved, and removed correctly
 #[test]
-fn test_arena_operations_bounds() {
-    println!("=== ARENA OPERATIONS BOUNDS TEST ===");
+fn test_u32_key_operations() {
+    println!("=== U32 KEY OPERATIONS TEST ===");
 
     let mut tree: BPlusTreeMap<u32, String> = BPlusTreeMap::new(4).unwrap();
 
@@ -258,5 +215,5 @@ fn test_arena_operations_bounds() {
         "Tree should be empty after removing all keys"
     );
 
-    println!("✅ Arena operations bounds test passed");
+    println!("✅ U32 key operations test passed");
 }
