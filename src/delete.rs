@@ -132,6 +132,15 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         let target_len = (*target_parts.hdr).len as usize;
         let source_len = (*source_parts.hdr).len as usize;
 
+        // CRITICAL FIX: Check if merge would exceed capacity
+        let merged_len = target_len + source_len;
+        if merged_len > self.leaf_layout.cap as usize {
+            // Cannot merge - would cause overflow. This should not happen if the
+            // rebalancing algorithm is correct, but we must prevent corruption.
+            panic!("Leaf merge would exceed capacity: {} > {}",
+                   merged_len, self.leaf_layout.cap);
+        }
+
         let target_keys = target_parts.keys_ptr as *mut K;
         let target_vals = target_parts.vals_ptr as *mut V;
         let source_keys = source_parts.keys_ptr as *const K;
@@ -364,6 +373,15 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         let left_len = (*left_parts.hdr).len as usize;
         let child_len = (*child_parts.hdr).len as usize;
 
+        // CRITICAL FIX: Check if merge would exceed capacity
+        let merged_len = left_len + 1 + child_len; // left + separator + child
+        if merged_len > self.branch_layout.cap as usize {
+            // Cannot merge - would cause overflow. This should not happen if the
+            // rebalancing algorithm is correct, but we must prevent corruption.
+            panic!("Branch merge would exceed capacity: {} > {}",
+                   merged_len, self.branch_layout.cap);
+        }
+
         let sep_slot = keys.add(child_idx - 1);
         let sep_key = core::ptr::read(sep_slot);
 
@@ -404,6 +422,15 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
 
         let child_len = (*child_parts.hdr).len as usize;
         let right_len = (*right_parts.hdr).len as usize;
+
+        // CRITICAL FIX: Check if merge would exceed capacity
+        let merged_len = child_len + 1 + right_len; // child + separator + right
+        if merged_len > self.branch_layout.cap as usize {
+            // Cannot merge - would cause overflow. This should not happen if the
+            // rebalancing algorithm is correct, but we must prevent corruption.
+            panic!("Branch merge would exceed capacity: {} > {}",
+                   merged_len, self.branch_layout.cap);
+        }
 
         let sep_slot = keys.add(child_idx);
         let sep_key = core::ptr::read(sep_slot);
