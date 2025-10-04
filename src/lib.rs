@@ -152,7 +152,7 @@ impl fmt::Display for BPlusTreeError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             BPlusTreeError::InvalidCapacity(s) => write!(f, "InvalidCapacity: {}", s),
-            BPlusTreeError::KeyNotFound => write!(f, "KeyNotFound"),
+            BPlusTreeError::KeyNotFound => write!(f, "Key not found"),
             BPlusTreeError::DataIntegrityError(s) => write!(f, "DataIntegrityError: {}", s),
             BPlusTreeError::ArenaError(s) => write!(f, "ArenaError: {}", s),
             BPlusTreeError::NodeError(s) => write!(f, "NodeError: {}", s),

@@ -22,8 +22,8 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         self.get(key).is_some()
     }
 
-    pub fn get_or_default<'a>(&'a self, _key: &K, default: &'a V) -> &'a V {
-        default
+    pub fn get_or_default<'a>(&'a self, key: &K, default: &'a V) -> &'a V {
+        self.get(key).unwrap_or(default)
     }
 
     pub fn get_many<'a>(&'a self, keys: &'a [K]) -> BTreeResult<Vec<&'a V>> {
