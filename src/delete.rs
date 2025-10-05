@@ -678,7 +678,7 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         let parts = layout::carve_leaf::<K, V>(leaf, &self.leaf_layout);
         let len = (*parts.hdr).len as usize;
         let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
-        let idx = keys.binary_search(key).ok()?;
+        let idx = self.binary_search_keys(keys, key).ok()?;
 
         // Read the key and value (transferring ownership)
         let removed_key = core::ptr::read((parts.keys_ptr as *const K).add(idx));

@@ -66,6 +66,13 @@ impl<K, V> BPlusTreeMap<K, V> {
 
 
 
+    /// Centralized binary search for keys in a node.
+    /// This function will be optimized for performance in future iterations.
+    #[inline(always)]
+    pub(crate) fn binary_search_keys<T: Ord>(&self, keys: &[T], target: &T) -> Result<usize, usize> {
+        keys.binary_search(target)
+    }
+
     /// Safely move a key-value pair from one location to another, ensuring sources are cleared.
     #[inline(always)]
     pub(crate) unsafe fn move_kv_at(
@@ -97,7 +104,7 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         let parts = layout::carve_branch::<K>(branch, &self.branch_layout);
         let len = (*parts.hdr).len as usize;
         let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
-        let child_idx = match keys.binary_search(key) {
+        let child_idx = match self.binary_search_keys(keys, key) {
             Ok(i) => i + 1,
             Err(i) => i,
         };

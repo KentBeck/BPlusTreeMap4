@@ -131,7 +131,7 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
                     layout::carve_leaf::<K, V>(NonNull::new_unchecked(cur), &self.leaf_layout);
                 let len = (*parts.hdr).len as usize;
                 let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
-                match keys.binary_search(s) {
+                match self.binary_search_keys(keys, s) {
                     Ok(i) => {
                         first_idx = if matches!(start, Bound::Excluded(_)) {
                             i + 1

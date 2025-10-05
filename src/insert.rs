@@ -177,7 +177,7 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         let hdr = &mut *parts.hdr;
         let len = hdr.len as usize;
         let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
-        match keys.binary_search(&key) {
+        match self.binary_search_keys(keys, &key) {
             Ok(idx) => {
                 let vptr = parts.vals_ptr.add(idx) as *mut V;
                 let old = core::ptr::read(vptr);
