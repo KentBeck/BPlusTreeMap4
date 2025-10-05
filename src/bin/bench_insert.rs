@@ -26,20 +26,22 @@ fn main() {
     // let previous = bench_previous(&dataset, &lookup_keys, cap);
     let std_map = bench_std(&dataset, &lookup_keys);
 
-    println!("\n=== Insert/Get Benchmark ===");
+    println!("\n=== Insert/Get/Iterate Benchmark ===");
     println!("items: {}  |  bplustree capacity: {}", n, cap);
     println!(
-        "{:<18} {:>12} {:>15} {:>12} {:>15}",
-        "target", "insert(s)", "insert Mops", "get(s)", "get Mops"
+        "{:<18} {:>12} {:>15} {:>12} {:>15} {:>12} {:>15}",
+        "target", "insert(s)", "insert Mops", "get(s)", "get Mops", "iter(s)", "iter Mops"
     );
     for result in [current, /* previous, */ std_map] {
         println!(
-            "{:<18} {:>12.3} {:>15.2} {:>12.3} {:>15.2}",
+            "{:<18} {:>12.3} {:>15.2} {:>12.3} {:>15.2} {:>12.3} {:>15.2}",
             result.label,
             result.insert.as_secs_f64(),
             throughput(n, result.insert),
             result.get.as_secs_f64(),
-            throughput(n, result.get)
+            throughput(n, result.get),
+            result.iterate.as_secs_f64(),
+            throughput(n, result.iterate)
         );
     }
 }
@@ -48,16 +50,19 @@ struct BenchResult {
     label: &'static str,
     insert: Duration,
     get: Duration,
+    iterate: Duration,
 }
 
 fn bench_current(dataset: &[(u64, u64)], lookups: &[u64], cap: usize) -> BenchResult {
     let mut map = BPlusTreeMap::new(cap).expect("current new");
     let insert = time_insert(&mut map, dataset);
     let get = time_get(|k| map.get(k), lookups);
+    let iterate = time_iterate(&map);
     BenchResult {
         label: "bplustree-current",
         insert,
         get,
+        iterate,
     }
 }
 
@@ -76,10 +81,12 @@ fn bench_std(dataset: &[(u64, u64)], lookups: &[u64]) -> BenchResult {
     let mut map = BTreeMap::new();
     let insert = time_insert(&mut map, dataset);
     let get = time_get(|k| map.get(k), lookups);
+    let iterate = time_iterate(&map);
     BenchResult {
         label: "std::BTreeMap",
         insert,
         get,
+        iterate,
     }
 }
 
@@ -115,6 +122,22 @@ where
     start.elapsed()
 }
 
+fn time_iterate<M>(map: &M) -> Duration
+where
+    M: IterateBenchmark,
+{
+    let start = Instant::now();
+    let mut count = 0;
+    for (k, v) in map.iter() {
+        black_box((k, v));
+        count += 1;
+    }
+    let elapsed = start.elapsed();
+    // Ensure we actually iterated over all elements
+    black_box(count);
+    elapsed
+}
+
 fn throughput(count: usize, duration: Duration) -> f64 {
     let secs = duration.as_secs_f64().max(1e-9);
     (count as f64 / 1_000_000.0) / secs
@@ -124,9 +147,21 @@ trait InsertBenchmark {
     fn insert(&mut self, key: u64, value: u64);
 }
 
+trait IterateBenchmark {
+    type Iter<'a>: Iterator<Item = (&'a u64, &'a u64)> where Self: 'a;
+    fn iter(&self) -> Self::Iter<'_>;
+}
+
 impl InsertBenchmark for BPlusTreeMap<u64, u64> {
     fn insert(&mut self, key: u64, value: u64) {
         Self::insert(self, key, value);
+    }
+}
+
+impl IterateBenchmark for BPlusTreeMap<u64, u64> {
+    type Iter<'a> = bplustree::Items<'a, u64, u64>;
+    fn iter(&self) -> Self::Iter<'_> {
+        self.items()
     }
 }
 
@@ -139,5 +174,12 @@ impl InsertBenchmark for BPlusTreeMap<u64, u64> {
 impl InsertBenchmark for BTreeMap<u64, u64> {
     fn insert(&mut self, key: u64, value: u64) {
         Self::insert(self, key, value);
+    }
+}
+
+impl IterateBenchmark for BTreeMap<u64, u64> {
+    type Iter<'a> = std::collections::btree_map::Iter<'a, u64, u64>;
+    fn iter(&self) -> Self::Iter<'_> {
+        self.iter()
     }
 }
