@@ -223,53 +223,10 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         self.len_count = 0;
     }
 
-    #[cfg(feature = "compat_test_api")]
-    pub fn allocate_leaf(&mut self, _node: LeafNodeCompat<K, V>) -> u32 {
-        0
-    }
 
-    #[cfg(feature = "compat_test_api")]
-    pub fn deallocate_leaf(&mut self, _id: u32) -> Option<LeafNodeCompat<K, V>> {
-        None
-    }
-
-    #[cfg(feature = "compat_test_api")]
-    pub fn get_leaf(&self, _id: u32) -> Option<&LeafNodeCompat<K, V>> {
-        None
-    }
-
-    #[cfg(feature = "compat_test_api")]
-    pub fn get_leaf_mut(&mut self, _id: u32) -> Option<&mut LeafNodeCompat<K, V>> {
-        None
-    }
-
-    #[cfg(feature = "compat_test_api")]
-    pub fn get_leaf_next(&self, _id: u32) -> Option<u32> {
-        None
-    }
-
-    #[cfg(feature = "compat_test_api")]
-    pub fn set_leaf_next(&mut self, _id: u32, _next: u32) -> bool {
-        true
-    }
 }
 
-// Minimal leaf node compatibility type used by arena-ish tests
-#[derive(Debug, Clone)]
-#[cfg(feature = "compat_test_api")]
-pub struct LeafNodeCompat<K, V> {
-    pub capacity: usize,
-    pub _phantom: PhantomData<(K, V)>,
-}
-#[cfg(feature = "compat_test_api")]
-impl<K, V> LeafNodeCompat<K, V> {
-    pub fn new(capacity: usize) -> Self {
-        Self {
-            capacity,
-            _phantom: PhantomData,
-        }
-    }
-}
+
 
 // ===============
 // Macros used in tests
@@ -382,9 +339,7 @@ impl core::cmp::PartialEq for BPlusTreeError {
 }
 impl Eq for BPlusTreeError {}
 
-// Compatibility alias for tests expecting LeafNode in crate root
-#[cfg(feature = "compat_test_api")]
-pub type LeafNode<K, V> = LeafNodeCompat<K, V>;
+
 
 // Extra convenience/debug API stubs used in tests
 #[cfg(feature = "compat_test_api")]
