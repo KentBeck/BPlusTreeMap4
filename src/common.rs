@@ -63,6 +63,42 @@ impl<K, V> BPlusTreeMap<K, V> {
     {
         (*keys_ptr.add(idx)).clone()
     }
+
+    /// Safely move a key from one location to another, ensuring the source is cleared.
+    /// This prevents double-free issues by zeroing the source memory.
+    #[inline]
+    pub(crate) unsafe fn move_key_at(
+        &self,
+        src_keys_ptr: *mut K,
+        src_idx: usize,
+        dst_keys_ptr: *mut K,
+        dst_idx: usize,
+    ) {
+        let key = core::ptr::read(src_keys_ptr.add(src_idx));
+        core::ptr::write(dst_keys_ptr.add(dst_idx), key);
+        // Clear the source slot by writing zeros to prevent double-free
+        core::ptr::write_bytes(src_keys_ptr.add(src_idx), 0, 1);
+    }
+
+    /// Safely move a key-value pair from one location to another, ensuring sources are cleared.
+    #[inline]
+    pub(crate) unsafe fn move_kv_at(
+        &self,
+        src_keys_ptr: *mut K,
+        src_vals_ptr: *mut V,
+        src_idx: usize,
+        dst_keys_ptr: *mut K,
+        dst_vals_ptr: *mut V,
+        dst_idx: usize,
+    ) {
+        let key = core::ptr::read(src_keys_ptr.add(src_idx));
+        let val = core::ptr::read(src_vals_ptr.add(src_idx));
+        core::ptr::write(dst_keys_ptr.add(dst_idx), key);
+        core::ptr::write(dst_vals_ptr.add(dst_idx), val);
+        // Clear the source slots by writing zeros to prevent double-free
+        core::ptr::write_bytes(src_keys_ptr.add(src_idx), 0, 1);
+        core::ptr::write_bytes(src_vals_ptr.add(src_idx), 0, 1);
+    }
 }
 
 impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {

@@ -300,7 +300,11 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
 
         let left_keys = left_parts.keys_ptr as *mut K;
         let left_children = left_parts.children_ptr as *mut *mut u8;
+
+        // CRITICAL FIX: Use safe move operation for the key
         let borrowed_key = core::ptr::read(left_keys.add(left_len - 1));
+        core::ptr::write_bytes(left_keys.add(left_len - 1), 0, 1); // Clear source key slot
+
         let borrowed_child = *left_children.add(left_len);
         (*left_parts.hdr).len = (left_len - 1) as u16;
         *left_children.add(left_len) = ptr::null_mut();
@@ -338,7 +342,11 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
 
         let right_keys = right_parts.keys_ptr as *mut K;
         let right_children = right_parts.children_ptr as *mut *mut u8;
+
+        // CRITICAL FIX: Use safe move operation for the key
         let new_sep = core::ptr::read(right_keys.add(0));
+        core::ptr::write_bytes(right_keys.add(0), 0, 1); // Clear source key slot
+
         let transfer_child = *right_children.add(0);
 
         let child_keys = child_parts.keys_ptr as *mut K;
@@ -349,6 +357,8 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
 
         if right_len > 1 {
             core::ptr::copy(right_keys.add(1), right_keys, right_len - 1);
+            // Clear the last key slot after shifting
+            core::ptr::write_bytes(right_keys.add(right_len - 1), 0, 1);
         }
         core::ptr::copy(right_children.add(1), right_children, right_len);
         *right_children.add(right_len) = ptr::null_mut();
@@ -512,26 +522,27 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         let left_len = (*left_parts.hdr).len as usize;
         let child_len = (*child_parts.hdr).len as usize;
 
-        let (key, val) = self.read_kv_at(
-            left_parts.keys_ptr as *const K,
-            left_parts.vals_ptr as *const V,
-            left_len - 1,
-        );
-        (*left_parts.hdr).len = (left_len - 1) as u16;
-
+        // Shift child items right first to make room
         self.shift_right(
             child_parts.keys_ptr as *mut K,
             child_parts.vals_ptr as *mut V,
             0,
             child_len,
         );
-        self.write_kv_at(
+
+        // CRITICAL FIX: Use safe move operation to transfer key-value from left to child
+        // This ensures the source slot is properly cleared to prevent double-free
+        self.move_kv_at(
+            left_parts.keys_ptr as *mut K,
+            left_parts.vals_ptr as *mut V,
+            left_len - 1,
             child_parts.keys_ptr as *mut K,
             child_parts.vals_ptr as *mut V,
             0,
-            key,
-            val,
         );
+
+        // Update lengths after the move
+        (*left_parts.hdr).len = (left_len - 1) as u16;
         (*child_parts.hdr).len = (child_len + 1) as u16;
 
         let new_sep = self.key_clone_at(child_parts.keys_ptr as *const K, 0);
@@ -557,24 +568,20 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         let child_len = (*child_parts.hdr).len as usize;
         let right_len = (*right_parts.hdr).len as usize;
 
-        let (key, val) = self.read_kv_at(
-            right_parts.keys_ptr as *const K,
-            right_parts.vals_ptr as *const V,
+        // CRITICAL FIX: Use safe move operation to transfer key-value from right to child
+        self.move_kv_at(
+            right_parts.keys_ptr as *mut K,
+            right_parts.vals_ptr as *mut V,
             0,
-        );
-
-        self.write_kv_at(
             child_parts.keys_ptr as *mut K,
             child_parts.vals_ptr as *mut V,
             child_len,
-            key,
-            val,
         );
         (*child_parts.hdr).len = (child_len + 1) as u16;
 
-        // Shift remaining items in right leaf and clean up the duplicate at the end
+        // Shift remaining items in right leaf left to fill the gap
+        // Since we used move_kv_at, the slot at index 0 is already cleared
         if right_len > 1 {
-            // Copy items [1..right_len) to positions [0..right_len-1)
             core::ptr::copy(
                 right_parts.keys_ptr.add(1) as *const K,
                 right_parts.keys_ptr as *mut K,
@@ -585,9 +592,9 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
                 right_parts.vals_ptr as *mut V,
                 right_len - 1,
             );
-            // Drop the duplicate at position right_len-1
-            core::ptr::drop_in_place(right_parts.keys_ptr.add(right_len - 1) as *mut K);
-            core::ptr::drop_in_place(right_parts.vals_ptr.add(right_len - 1) as *mut V);
+            // Clear the last slot to prevent stale data
+            core::ptr::write_bytes(right_parts.keys_ptr.add(right_len - 1), 0, 1);
+            core::ptr::write_bytes(right_parts.vals_ptr.add(right_len - 1), 0, 1);
         }
         // If right_len == 1, we've already transferred the only item, so nothing to drop
         (*right_parts.hdr).len = (right_len - 1) as u16;
