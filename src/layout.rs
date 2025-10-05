@@ -267,7 +267,7 @@ pub struct BranchParts<K> {
 impl<K> BranchParts<K> {}
 
 /// Carve a leaf node's header, sibling pointers, and arrays from a raw base pointer.
-#[inline]
+#[inline(always)]
 pub unsafe fn carve_leaf<K, V>(base: NonNull<u8>, layout: &LeafLayout) -> LeafParts<K, V> {
     let p = base.as_ptr();
     let hdr = p as *mut NodeHdr;
@@ -279,7 +279,7 @@ pub unsafe fn carve_leaf<K, V>(base: NonNull<u8>, layout: &LeafLayout) -> LeafPa
 }
 
 /// Carve a branch node's header, children pointers, and keys array from a raw base pointer.
-#[inline]
+#[inline(always)]
 pub unsafe fn carve_branch<K>(base: NonNull<u8>, layout: &BranchLayout) -> BranchParts<K> {
     let p = base.as_ptr();
     let hdr = p as *mut NodeHdr;

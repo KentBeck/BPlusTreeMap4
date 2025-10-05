@@ -12,7 +12,7 @@ pub(crate) struct ValidationState<K> {
 }
 
 impl<K, V> BPlusTreeMap<K, V> {
-    #[inline]
+    #[inline(always)]
     pub(crate) unsafe fn shift_right(
         &self,
         keys_ptr: *mut K,
@@ -26,7 +26,7 @@ impl<K, V> BPlusTreeMap<K, V> {
         }
     }
 
-    #[inline]
+    #[inline(always)]
     pub(crate) unsafe fn write_kv_at(
         &self,
         keys_ptr: *mut K,
@@ -39,12 +39,12 @@ impl<K, V> BPlusTreeMap<K, V> {
         core::ptr::write(vals_ptr.add(idx), val);
     }
 
-    #[inline]
+    #[inline(always)]
     pub(crate) unsafe fn write_key_at(&self, keys_ptr: *mut K, idx: usize, key: K) {
         core::ptr::write(keys_ptr.add(idx), key);
     }
 
-    #[inline]
+    #[inline(always)]
     pub(crate) unsafe fn read_kv_at(
         &self,
         keys_ptr: *const K,
@@ -81,7 +81,7 @@ impl<K, V> BPlusTreeMap<K, V> {
     }
 
     /// Safely move a key-value pair from one location to another, ensuring sources are cleared.
-    #[inline]
+    #[inline(always)]
     pub(crate) unsafe fn move_kv_at(
         &self,
         src_keys_ptr: *mut K,
