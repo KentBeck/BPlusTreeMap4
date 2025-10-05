@@ -75,6 +75,7 @@ fn test_tree_with_drop_tracking() {
     
     #[derive(Clone)]
     struct DropTracker {
+        #[allow(dead_code)]
         id: usize,
         counter: Arc<AtomicUsize>,
     }
