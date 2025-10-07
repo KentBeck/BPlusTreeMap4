@@ -34,6 +34,12 @@ pub struct BPlusTreeMap<K, V> {
 
     _marker: PhantomData<(K, V)>,
     // Total number of key-value pairs
+    // TODO(tech-debt): Consider removing len_count and computing length dynamically by walking
+    // the leaf linked list when len() is called. This will be slower, but it avoids subtle
+    // bookkeeping bugs and makes inserts/deletes simpler and easier to reason about. Our
+    // invariants check already recomputes actual item count and compares it to len_count;
+    // eliminating len_count would remove an entire class of mismatch bugs.
+
     len_count: usize,
 }
 
@@ -90,19 +96,19 @@ impl<K, V> BPlusTreeMap<K, V> {
             NodeTag::Leaf => {
                 let parts = layout::carve_leaf::<K, V>(node, &self.leaf_layout);
                 let len = (*parts.hdr).len as usize;
-                
+
                 // Drop all keys and values
                 for i in 0..len {
                     ptr::drop_in_place((parts.keys_ptr as *mut K).add(i));
                     ptr::drop_in_place((parts.vals_ptr as *mut V).add(i));
                 }
-                
+
                 dealloc_raw(node, self.leaf_layout.bytes, self.leaf_layout.max_align);
             }
             NodeTag::Branch => {
                 let parts = layout::carve_branch::<K>(node, &self.branch_layout);
                 let len = (*parts.hdr).len as usize;
-                
+
                 // Recursively free all children first
                 for i in 0..=len {
                     let child_ptr = *((parts.children_ptr as *const *mut u8).add(i));
@@ -110,12 +116,12 @@ impl<K, V> BPlusTreeMap<K, V> {
                         self.free_tree_no_drop(child);
                     }
                 }
-                
+
                 // Drop all separator keys
                 for i in 0..len {
                     ptr::drop_in_place((parts.keys_ptr as *mut K).add(i));
                 }
-                
+
                 dealloc_raw(node, self.branch_layout.bytes, self.branch_layout.max_align);
             }
         }

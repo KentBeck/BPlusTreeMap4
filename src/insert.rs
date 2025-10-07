@@ -167,6 +167,46 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         }
     }
 
+    #[inline(always)]
+    unsafe fn insert_into_leaf_slot(
+        &mut self,
+        parts: layout::LeafParts<K, V>,
+        idx: usize,
+        cur_len: usize,
+        key: K,
+        value: V,
+    ) {
+        self.shift_right(
+            parts.keys_ptr as *mut K,
+            parts.vals_ptr as *mut V,
+            idx,
+            cur_len,
+        );
+        self.write_kv_at(
+            parts.keys_ptr as *mut K,
+            parts.vals_ptr as *mut V,
+            idx,
+            key,
+            value,
+        );
+        (*parts.hdr).len = (cur_len + 1) as u16;
+        self.len_count += 1;
+    }
+    #[inline(always)]
+    unsafe fn shift_and_write(
+        &self,
+        keys_ptr: *mut K,
+        vals_ptr: *mut V,
+        idx: usize,
+        cur_len: usize,
+        key: K,
+        value: V,
+    ) {
+        self.shift_right(keys_ptr, vals_ptr, idx, cur_len);
+        self.write_kv_at(keys_ptr, vals_ptr, idx, key, value);
+    }
+
+
     unsafe fn leaf_insert_or_split(
         &mut self,
         leaf: NonNull<u8>,
@@ -186,16 +226,7 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
             }
             Err(idx) => {
                 if len < self.leaf_layout.cap as usize {
-                    self.shift_right(parts.keys_ptr as *mut K, parts.vals_ptr as *mut V, idx, len);
-                    self.write_kv_at(
-                        parts.keys_ptr as *mut K,
-                        parts.vals_ptr as *mut V,
-                        idx,
-                        key,
-                        value,
-                    );
-                    hdr.len = (len + 1) as u16;
-                    self.len_count += 1;
+                    self.insert_into_leaf_slot(parts, idx, len, key, value);
                     InsertResult::NoSplit(None)
                 } else {
                     // Zero-allocation in-place split: move upper half to right, insert new item, clear moved slots
@@ -230,16 +261,11 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
                     // Insert new item into the correct side
                     if insert_pos < left_count {
                         // Insert into left: shift [insert_pos..left_keep) right by 1, then write
-                        self.shift_right(
+                        self.shift_and_write(
                             parts.keys_ptr as *mut K,
                             parts.vals_ptr as *mut V,
                             insert_pos,
                             left_keep,
-                        );
-                        self.write_kv_at(
-                            parts.keys_ptr as *mut K,
-                            parts.vals_ptr as *mut V,
-                            insert_pos,
                             key,
                             value,
                         );
@@ -249,16 +275,11 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
                     } else {
                         // Insert into right
                         let right_insert = insert_pos - left_keep; // position within right
-                        self.shift_right(
+                        self.shift_and_write(
                             r.keys_ptr as *mut K,
                             r.vals_ptr as *mut V,
                             right_insert,
                             right_len,
-                        );
-                        self.write_kv_at(
-                            r.keys_ptr as *mut K,
-                            r.vals_ptr as *mut V,
-                            right_insert,
                             key,
                             value,
                         );
