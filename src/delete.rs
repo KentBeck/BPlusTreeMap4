@@ -699,7 +699,6 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         }
 
         (*parts.hdr).len = (len - 1) as u16;
-        self.len_count -= 1;
         
         // Drop the removed key (value is returned to caller)
         drop(removed_key);

@@ -33,14 +33,6 @@ pub struct BPlusTreeMap<K, V> {
     branch_layout: BranchLayout,
 
     _marker: PhantomData<(K, V)>,
-    // Total number of key-value pairs
-    // TODO(tech-debt): Consider removing len_count and computing length dynamically by walking
-    // the leaf linked list when len() is called. This will be slower, but it avoids subtle
-    // bookkeeping bugs and makes inserts/deletes simpler and easier to reason about. Our
-    // invariants check already recomputes actual item count and compares it to len_count;
-    // eliminating len_count would remove an entire class of mismatch bugs.
-
-    len_count: usize,
 }
 
 impl<K, V> Drop for BPlusTreeMap<K, V> {
@@ -67,7 +59,6 @@ impl<K, V> BPlusTreeMap<K, V> {
             leaf_layout,
             branch_layout,
             _marker: PhantomData,
-            len_count: 0,
         }
     }
 
@@ -202,7 +193,6 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
             leaf_layout,
             branch_layout,
             _marker: PhantomData,
-            len_count: 0,
         };
         unsafe {
             let leaf = alloc_leaf_block(&tree.leaf_layout)
@@ -213,20 +203,32 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
     }
 
     pub fn is_empty(&self) -> bool {
-        self.len_count == 0
+        self.len() == 0
     }
 
     pub fn len(&self) -> usize {
-        self.len_count
+        // Compute dynamically by walking the leaf linked list from the leftmost leaf
+        let mut total = 0usize;
+        let mut cur = match self.leftmost_leaf() {
+            Some(p) => p.as_ptr(),
+            None => core::ptr::null_mut(),
+        };
+        unsafe {
+            while !cur.is_null() {
+                let hdr = &*(cur as *const NodeHdr);
+                if hdr.tag != NodeTag::Leaf { break; }
+                let parts = layout::carve_leaf::<K, V>(NonNull::new_unchecked(cur), &self.leaf_layout);
+                total += (*parts.hdr).len as usize;
+                cur = *parts.next_ptr;
+            }
+        }
+        total
     }
 
     pub fn clear(&mut self) {
         if let Some(root) = self.root.take() {
-            unsafe {
-                self.free_tree_no_drop(root);
-            }
+            unsafe { self.free_tree_no_drop(root); }
         }
-        self.len_count = 0;
     }
 
 

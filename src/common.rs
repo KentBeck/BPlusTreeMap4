@@ -193,22 +193,9 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
 
         unsafe {
             match self.root {
-                None => {
-                    if self.len_count == 0 {
-                        Ok(())
-                    } else {
-                        Err("Tree has no root but len_count > 0".into())
-                    }
-                }
+                None => Ok(()),
                 Some(root) => {
                     self.validate_node(root, None, None, true, &mut state)?;
-
-                    if self.len_count != state.total_items {
-                        return Err(format!(
-                            "len_count mismatch: recorded {}, actual {}",
-                            self.len_count, state.total_items
-                        ));
-                    }
 
                     if let Some(last_leaf) = state.prev_leaf {
                         let next_ptr =

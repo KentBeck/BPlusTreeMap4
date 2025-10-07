@@ -190,7 +190,6 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
             value,
         );
         (*parts.hdr).len = (cur_len + 1) as u16;
-        self.len_count += 1;
     }
     #[inline(always)]
     unsafe fn shift_and_write(
@@ -303,7 +302,6 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
                         }
                     }
 
-                    self.len_count += 1;
                     let sep = self.key_clone_at(r.keys_ptr as *const K, 0);
                     InsertResult::Split {
                         sep_key: sep,
