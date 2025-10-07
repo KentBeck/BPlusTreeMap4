@@ -1,5 +1,5 @@
 use alloc::vec::Vec;
-use core::mem::ManuallyDrop;
+
 use core::ptr::NonNull;
 
 use crate::layout;
@@ -198,46 +198,75 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
                     self.len_count += 1;
                     InsertResult::NoSplit(None)
                 } else {
-                    let mut items_vec: Vec<(K, V)> = Vec::with_capacity(len + 1);
-                    for i in 0..len {
-                        let (k, v) = self.read_kv_at(
-                            parts.keys_ptr as *const K,
-                            parts.vals_ptr as *const V,
-                            i,
-                        );
-                        items_vec.push((k, v));
-                    }
-                    let pos = items_vec
-                        .binary_search_by(|(kk, _)| kk.cmp(&key))
-                        .unwrap_or_else(|e| e);
-                    items_vec.insert(pos, (key, value));
-                    let total = items_vec.len();
-                    let left_count = total / 2;
-                    let right_count = total - left_count;
-                    let mut items = ManuallyDrop::new(items_vec);
-                    let base = items.as_mut_ptr();
-                    let cap = items.capacity();
-                    for i in 0..left_count {
-                        let (kk, vv) = core::ptr::read(base.add(i));
-                        self.write_kv_at(
+                    // Zero-allocation in-place split: move upper half to right, insert new item, clear moved slots
+                    let total_items = len + 1;
+                    let left_count = total_items / 2;
+                    let right_count = total_items - left_count;
+
+                    // Determine insertion position (idx from Err was computed above as `idx`)
+                    let insert_pos = idx;
+
+                    // Allocate right node and carve
+                    let right = alloc_leaf_block(&self.leaf_layout).expect("alloc right leaf");
+                    let r = layout::carve_leaf::<K, V>(right, &self.leaf_layout);
+
+                    // Decide how many existing items remain on the left before insertion
+                    let left_keep = if insert_pos < left_count { left_count - 1 } else { left_count };
+
+                    // Move items [left_keep..len) to right at positions [0..)
+                    let mut right_len = 0usize;
+                    for i in left_keep..len {
+                        self.move_kv_at(
                             parts.keys_ptr as *mut K,
                             parts.vals_ptr as *mut V,
                             i,
-                            kk,
-                            vv,
+                            r.keys_ptr as *mut K,
+                            r.vals_ptr as *mut V,
+                            right_len,
                         );
+                        right_len += 1;
                     }
-                    hdr.len = left_count as u16;
 
-                    let right = alloc_leaf_block(&self.leaf_layout).expect("alloc right leaf");
-                    let r = layout::carve_leaf::<K, V>(right, &self.leaf_layout);
-                    (*r.hdr).len = right_count as u16;
-                    for i in 0..right_count {
-                        let (kk, vv) = core::ptr::read(base.add(left_count + i));
-                        self.write_kv_at(r.keys_ptr as *mut K, r.vals_ptr as *mut V, i, kk, vv);
+                    // Insert new item into the correct side
+                    if insert_pos < left_count {
+                        // Insert into left: shift [insert_pos..left_keep) right by 1, then write
+                        self.shift_right(
+                            parts.keys_ptr as *mut K,
+                            parts.vals_ptr as *mut V,
+                            insert_pos,
+                            left_keep,
+                        );
+                        self.write_kv_at(
+                            parts.keys_ptr as *mut K,
+                            parts.vals_ptr as *mut V,
+                            insert_pos,
+                            key,
+                            value,
+                        );
+                        // Left now has left_count items; right already has right_count
+                        hdr.len = left_count as u16;
+                        (*r.hdr).len = right_count as u16;
+                    } else {
+                        // Insert into right
+                        let right_insert = insert_pos - left_keep; // position within right
+                        self.shift_right(
+                            r.keys_ptr as *mut K,
+                            r.vals_ptr as *mut V,
+                            right_insert,
+                            right_len,
+                        );
+                        self.write_kv_at(
+                            r.keys_ptr as *mut K,
+                            r.vals_ptr as *mut V,
+                            right_insert,
+                            key,
+                            value,
+                        );
+                        hdr.len = left_keep as u16; // equals left_count
+                        (*r.hdr).len = (right_len + 1) as u16; // equals right_count
                     }
-                    let _ = Vec::<(K, V)>::from_raw_parts(base, 0, cap);
 
+                    // Link leaf siblings
                     let left_next = parts.next_ptr;
                     let old_next = *left_next;
                     *left_next = right.as_ptr();
