@@ -1,4 +1,5 @@
 use std::alloc::{GlobalAlloc, Layout, System};
+use std::cell::Cell;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 mod test_utils;
@@ -9,6 +10,14 @@ struct TrackingAllocator;
 static ALLOC_CALLS: AtomicUsize = AtomicUsize::new(0);
 static ALLOC_BYTES: AtomicUsize = AtomicUsize::new(0);
 static DEALLOC_CALLS: AtomicUsize = AtomicUsize::new(0);
+
+thread_local! {
+    static TL_ALLOC_CALLS: Cell<usize> = Cell::new(0);
+    static TL_ALLOC_BYTES: Cell<usize> = Cell::new(0);
+    static TL_DEALLOC_CALLS: Cell<usize> = Cell::new(0);
+    static TL_DEALLOC_BYTES: Cell<usize> = Cell::new(0);
+}
+
 static DEALLOC_BYTES: AtomicUsize = AtomicUsize::new(0);
 
 unsafe impl GlobalAlloc for TrackingAllocator {
@@ -17,6 +26,8 @@ unsafe impl GlobalAlloc for TrackingAllocator {
         if !ptr.is_null() {
             ALLOC_CALLS.fetch_add(1, Ordering::SeqCst);
             ALLOC_BYTES.fetch_add(layout.size(), Ordering::SeqCst);
+            TL_ALLOC_CALLS.with(|c| c.set(c.get() + 1));
+            TL_ALLOC_BYTES.with(|c| c.set(c.get() + layout.size()));
         }
         ptr
     }
@@ -25,6 +36,8 @@ unsafe impl GlobalAlloc for TrackingAllocator {
         if !ptr.is_null() {
             DEALLOC_CALLS.fetch_add(1, Ordering::SeqCst);
             DEALLOC_BYTES.fetch_add(layout.size(), Ordering::SeqCst);
+            TL_DEALLOC_CALLS.with(|c| c.set(c.get() + 1));
+            TL_DEALLOC_BYTES.with(|c| c.set(c.get() + layout.size()));
         }
         System.dealloc(ptr, layout);
     }
@@ -34,19 +47,18 @@ unsafe impl GlobalAlloc for TrackingAllocator {
 static GLOBAL: TrackingAllocator = TrackingAllocator;
 
 fn reset_alloc_metrics() {
-    ALLOC_CALLS.store(0, Ordering::SeqCst);
-    ALLOC_BYTES.store(0, Ordering::SeqCst);
-    DEALLOC_CALLS.store(0, Ordering::SeqCst);
-    DEALLOC_BYTES.store(0, Ordering::SeqCst);
+    TL_ALLOC_CALLS.with(|c| c.set(0));
+    TL_ALLOC_BYTES.with(|c| c.set(0));
+    TL_DEALLOC_CALLS.with(|c| c.set(0));
+    TL_DEALLOC_BYTES.with(|c| c.set(0));
 }
 
 fn alloc_metrics() -> (usize, usize, usize, usize) {
-    (
-        ALLOC_CALLS.load(Ordering::SeqCst),
-        ALLOC_BYTES.load(Ordering::SeqCst),
-        DEALLOC_CALLS.load(Ordering::SeqCst),
-        DEALLOC_BYTES.load(Ordering::SeqCst),
-    )
+    let alloc_calls = TL_ALLOC_CALLS.with(|c| c.get());
+    let alloc_bytes = TL_ALLOC_BYTES.with(|c| c.get());
+    let dealloc_calls = TL_DEALLOC_CALLS.with(|c| c.get());
+    let dealloc_bytes = TL_DEALLOC_BYTES.with(|c| c.get());
+    (alloc_calls, alloc_bytes, dealloc_calls, dealloc_bytes)
 }
 
 #[test]
