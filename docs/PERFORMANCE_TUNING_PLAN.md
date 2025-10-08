@@ -4,6 +4,42 @@
 
 Based on profiling analysis and code review, this plan identifies optimization opportunities to further improve BPlusTreeMap4's already impressive performance. Current benchmarks show 2-4x advantages over std::BTreeMap in most operations, with room for additional gains.
 
+
+## Latest Benchmark Snapshot (focus: capacity 128/256)
+
+- Environment: release build, bench_insert binary, dataset = LCG pseudo-random keys/values
+- Note: After removing len_count, len() computes dynamically; benchmarks avoid len() hot paths
+
+1M items
+
+| Capacity | Target            | Insert (s/Mops) | Get (s/Mops) | Delete (s/Mops) | Mixed (s/Mops) | Iterate (s/Mops) |
+|----------|-------------------|-----------------|--------------|-----------------|----------------|------------------|
+| 128      | bplustree-current | 0.213 / 4.69    | 0.084 / 11.97| 0.228 / 4.38    | 0.231 / 4.33   | 0.004 / 244.23   |
+| 128      | std::BTreeMap     | 0.186 / 5.39    | 0.211 / 4.73 | 0.193 / 5.17    | 0.212 / 4.71   | 0.010 / 95.67    |
+| 256      | bplustree-current | 0.257 / 3.89    | 0.065 / 15.28| 0.164 / 6.11    | 0.181 / 5.51   | 0.004 / 255.07   |
+| 256      | std::BTreeMap     | 0.170 / 5.87    | 0.202 / 4.95 | 0.208 / 4.81    | 0.220 / 4.54   | 0.018 / 56.22    |
+
+10M items
+
+| Capacity | Target            | Insert (s/Mops) | Get (s/Mops) | Delete (s/Mops) | Mixed (s/Mops) | Iterate (s/Mops) |
+|----------|-------------------|-----------------|--------------|-----------------|----------------|------------------|
+| 128      | bplustree-current | 5.266 / 1.90    | 1.655 / 6.04 | 6.029 / 1.66    | 6.676 / 1.50   | 0.058 / 173.44   |
+| 128      | std::BTreeMap     | 4.500 / 2.22    | 4.666 / 2.14 | 6.365 / 1.57    | 6.538 / 1.53   | 0.159 / 62.80    |
+| 256      | bplustree-current | 6.031 / 1.66    | 1.929 / 5.18 | 6.450 / 1.55    | 7.581 / 1.32   | 0.061 / 162.94   |
+| 256      | std::BTreeMap     | 4.248 / 2.35    | 4.500 / 2.22 | 4.316 / 2.32    | 5.898 / 1.70   | 0.142 / 70.23    |
+
+Observations
+- Lookups: 2.4–3.1x faster at cap=128/256; bigger cap improves get substantially
+- Iteration: 2.4–4.1x faster at cap=128; ~2.3–4.5x at cap=256
+- Mixed: parity to +1.2x vs std at 1M; slightly behind at 10M for cap=256
+- Deletion: roughly on par at 1M (cap=256), a bit slower at 10M
+- Insert: still behind std at these caps (1.66–1.90 Mops vs 2.22–2.35 Mops)
+
+Actionable focus based on current data
+- Insertion path remains top priority at cap=128/256
+- Gains from larger cap suggest we should bias default capacity upward for throughput-oriented workloads
+- Reassess branch/leaf split costs and memory copy patterns at high caps (more bytes moved per shift)
+
 ## Current Performance Profile
 
 ### Strengths
@@ -110,7 +146,7 @@ pub struct StreamingItems<'a, K, V> {
 
 impl<'a, K: Ord, V> Iterator for StreamingItems<'a, K, V> {
     type Item = (&'a K, &'a V);
-    
+
     fn next(&mut self) -> Option<Self::Item> {
         // Direct pointer-based iteration without Vec allocation
     }
@@ -154,15 +190,15 @@ struct NodePool {
 ```rust
 #[cfg(target_arch = "x86_64")]
 unsafe fn simd_shift_right_avx2(
-    keys: *mut u64, 
-    vals: *mut u64, 
-    idx: usize, 
+    keys: *mut u64,
+    vals: *mut u64,
+    idx: usize,
     len: usize
 ) {
     // Use AVX2 instructions for 4x parallel 64-bit moves
     // Especially effective for capacity 128+ nodes
     use core::arch::x86_64::*;
-    
+
     let chunks = (len - idx) / 4;
     for i in 0..chunks {
         let offset = (len - 4 * (i + 1)) * 8;

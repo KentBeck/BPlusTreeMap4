@@ -243,18 +243,25 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
                     // Decide how many existing items remain on the left before insertion
                     let left_keep = if insert_pos < left_count { left_count - 1 } else { left_count };
 
-                    // Move items [left_keep..len) to right at positions [0..)
+                    // Move items [left_keep..len) to right at positions [0..) using bulk copy
+                    let move_count = len - left_keep;
                     let mut right_len = 0usize;
-                    for i in left_keep..len {
-                        self.move_kv_at(
-                            parts.keys_ptr as *mut K,
-                            parts.vals_ptr as *mut V,
-                            i,
+                    if move_count > 0 {
+                        // Bulk move keys and values
+                        core::ptr::copy_nonoverlapping(
+                            (parts.keys_ptr as *const K).add(left_keep),
                             r.keys_ptr as *mut K,
-                            r.vals_ptr as *mut V,
-                            right_len,
+                            move_count,
                         );
-                        right_len += 1;
+                        core::ptr::copy_nonoverlapping(
+                            (parts.vals_ptr as *const V).add(left_keep),
+                            r.vals_ptr as *mut V,
+                            move_count,
+                        );
+                        // Clear moved slots in the left leaf to avoid accidental drops/use
+                        core::ptr::write_bytes((parts.keys_ptr as *mut K).add(left_keep), 0, move_count);
+                        core::ptr::write_bytes((parts.vals_ptr as *mut V).add(left_keep), 0, move_count);
+                        right_len = move_count;
                     }
 
                     // Insert new item into the correct side
