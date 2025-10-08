@@ -47,5 +47,8 @@ fn test_split_balance() {
     insert_sequential_range(&mut tree, 20);
 
     // Verify tree maintains invariants after splits
-    assert!(tree.check_invariants(), "Tree should maintain invariants after splits");
+    assert!(
+        tree.check_invariants(),
+        "Tree should maintain invariants after splits"
+    );
 }

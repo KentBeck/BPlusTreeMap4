@@ -159,5 +159,3 @@ fn test_root_collapse_edge_cases() {
         );
     }
 }
-
-

@@ -216,8 +216,11 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         unsafe {
             while !cur.is_null() {
                 let hdr = &*(cur as *const NodeHdr);
-                if hdr.tag != NodeTag::Leaf { break; }
-                let parts = layout::carve_leaf::<K, V>(NonNull::new_unchecked(cur), &self.leaf_layout);
+                if hdr.tag != NodeTag::Leaf {
+                    break;
+                }
+                let parts =
+                    layout::carve_leaf::<K, V>(NonNull::new_unchecked(cur), &self.leaf_layout);
                 total += (*parts.hdr).len as usize;
                 cur = *parts.next_ptr;
             }
@@ -227,14 +230,12 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
 
     pub fn clear(&mut self) {
         if let Some(root) = self.root.take() {
-            unsafe { self.free_tree_no_drop(root); }
+            unsafe {
+                self.free_tree_no_drop(root);
+            }
         }
     }
-
-
 }
-
-
 
 // ===============
 // Macros used in tests
@@ -346,8 +347,6 @@ impl core::cmp::PartialEq for BPlusTreeError {
     }
 }
 impl Eq for BPlusTreeError {}
-
-
 
 // Extra convenience/debug API stubs used in tests
 #[cfg(feature = "compat_test_api")]

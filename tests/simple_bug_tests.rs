@@ -114,5 +114,3 @@ fn test_iterator_consistency() {
 
     assert_eq!(iter1, range_all, "Range(..) should match full iteration");
 }
-
-

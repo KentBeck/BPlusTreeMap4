@@ -851,8 +851,6 @@ fn test_comprehensive_insert_scenarios() {
 // These tests were for a different architecture and are no longer relevant
 // ============================================================================
 
-
-
 // TODO: Implement test_leaf_node_creation
 // TODO: Implement test_leaf_node_insert
 // TODO: Implement test_leaf_node_full
@@ -1984,7 +1982,6 @@ fn test_get_mut() {
     // Test with a non-existent key
     assert_eq!(tree.get_mut(&3), None);
 }
-
 
 #[test]
 fn test_leaf_linked_list_completeness() {

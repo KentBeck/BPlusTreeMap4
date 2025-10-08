@@ -61,10 +61,7 @@ fn fuzz_test_bplustree() {
                     );
                     println!("BPlusTree returned: {:?}", bplus_value);
                     println!("BTreeMap returned: {:?}", btree_value);
-                    println!(
-                        "BPlusTree has {} nodes",
-                        bplustree.leaf_count(),
-                    );
+                    println!("BPlusTree has {} nodes", bplustree.leaf_count(),);
                     println!("Operations so far:");
                     for op in &operations {
                         println!("  {}", op);
@@ -91,7 +88,10 @@ fn fuzz_test_bplustree() {
             let btree_slice: Vec<_> = btree_map.iter().collect();
 
             if bplus_slice.len() != btree_slice.len() {
-                println!("ITERATION LENGTH MISMATCH after insert({}, {}):", key, value);
+                println!(
+                    "ITERATION LENGTH MISMATCH after insert({}, {}):",
+                    key, value
+                );
                 println!("BPlusTree iteration len: {}", bplus_slice.len());
                 println!("BTreeMap slice len: {}", btree_slice.len());
                 println!("Operations so far:");
@@ -215,10 +215,7 @@ fn fuzz_test_with_random_keys() {
                     );
                     println!("BPlusTree returned: {:?}", bplus_value);
                     println!("BTreeMap returned: {:?}", btree_value);
-                    println!(
-                        "BPlusTree has {} nodes",
-                        bplustree.leaf_count(),
-                    );
+                    println!("BPlusTree has {} nodes", bplustree.leaf_count(),);
                     println!("Operations so far:");
                     for op in &operations {
                         println!("  {}", op);
@@ -389,10 +386,7 @@ fn fuzz_test_timed() {
                             );
                             println!("BPlusTree returned: {:?}", bplus_value);
                             println!("BTreeMap returned: {:?}", btree_value);
-                            println!(
-                                "Tree has {} nodes ",
-                                bplustree.leaf_count(),
-                            );
+                            println!("Tree has {} nodes ", bplustree.leaf_count(),);
                             println!("Recent operations:");
                             for op in operations.iter().rev().take(20) {
                                 println!("  {}", op);

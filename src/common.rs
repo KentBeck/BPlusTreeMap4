@@ -64,12 +64,14 @@ impl<K, V> BPlusTreeMap<K, V> {
         (*keys_ptr.add(idx)).clone()
     }
 
-
-
     /// Centralized binary search for keys in a node.
     /// This function will be optimized for performance in future iterations.
     #[inline(always)]
-    pub(crate) fn binary_search_keys<T: Ord>(&self, keys: &[T], target: &T) -> Result<usize, usize> {
+    pub(crate) fn binary_search_keys<T: Ord>(
+        &self,
+        keys: &[T],
+        target: &T,
+    ) -> Result<usize, usize> {
         keys.binary_search(target)
     }
 

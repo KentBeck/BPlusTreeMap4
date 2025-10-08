@@ -137,8 +137,10 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         if merged_len > self.leaf_layout.cap as usize {
             // Cannot merge - would cause overflow. This should not happen if the
             // rebalancing algorithm is correct, but we must prevent corruption.
-            panic!("Leaf merge would exceed capacity: {} > {}",
-                   merged_len, self.leaf_layout.cap);
+            panic!(
+                "Leaf merge would exceed capacity: {} > {}",
+                merged_len, self.leaf_layout.cap
+            );
         }
 
         let target_keys = target_parts.keys_ptr as *mut K;
@@ -388,8 +390,10 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         if merged_len > self.branch_layout.cap as usize {
             // Cannot merge - would cause overflow. This should not happen if the
             // rebalancing algorithm is correct, but we must prevent corruption.
-            panic!("Branch merge would exceed capacity: {} > {}",
-                   merged_len, self.branch_layout.cap);
+            panic!(
+                "Branch merge would exceed capacity: {} > {}",
+                merged_len, self.branch_layout.cap
+            );
         }
 
         let sep_slot = keys.add(child_idx - 1);
@@ -438,8 +442,10 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         if merged_len > self.branch_layout.cap as usize {
             // Cannot merge - would cause overflow. This should not happen if the
             // rebalancing algorithm is correct, but we must prevent corruption.
-            panic!("Branch merge would exceed capacity: {} > {}",
-                   merged_len, self.branch_layout.cap);
+            panic!(
+                "Branch merge would exceed capacity: {} > {}",
+                merged_len, self.branch_layout.cap
+            );
         }
 
         let sep_slot = keys.add(child_idx);
@@ -470,12 +476,12 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
     unsafe fn free_branch_node(&mut self, node: NonNull<u8>) {
         let parts = layout::carve_branch::<K>(node, &self.branch_layout);
         let len = (*parts.hdr).len as usize;
-        
+
         // Drop all separator keys before deallocating
         for i in 0..len {
             ptr::drop_in_place((parts.keys_ptr as *mut K).add(i));
         }
-        
+
         dealloc_raw(node, self.branch_layout.bytes, self.branch_layout.max_align);
     }
 
@@ -496,7 +502,7 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         }
         // After shifting, the last key slot (at len-1) now contains a duplicate.
         // We must not drop it, so we'll rely on the length being decremented.
-        
+
         core::ptr::copy(
             children.add(key_idx + 2),
             children.add(key_idx + 1),
@@ -699,10 +705,10 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         }
 
         (*parts.hdr).len = (len - 1) as u16;
-        
+
         // Drop the removed key (value is returned to caller)
         drop(removed_key);
-        
+
         Some(value)
     }
 

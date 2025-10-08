@@ -30,7 +30,17 @@ fn main() {
     println!("items: {}  |  bplustree capacity: {}", n, cap);
     println!(
         "{:<18} {:>10} {:>12} {:>10} {:>12} {:>10} {:>12} {:>10} {:>12} {:>10} {:>12}",
-        "target", "ins(s)", "ins Mops", "get(s)", "get Mops", "del(s)", "del Mops", "mix(s)", "mix Mops", "iter(s)", "iter Mops"
+        "target",
+        "ins(s)",
+        "ins Mops",
+        "get(s)",
+        "get Mops",
+        "del(s)",
+        "del Mops",
+        "mix(s)",
+        "mix Mops",
+        "iter(s)",
+        "iter Mops"
     );
     for result in [current, /* previous, */ std_map] {
         println!(
@@ -236,7 +246,9 @@ trait DeleteBenchmark {
 }
 
 trait IterateBenchmark {
-    type Iter<'a>: Iterator<Item = (&'a u64, &'a u64)> where Self: 'a;
+    type Iter<'a>: Iterator<Item = (&'a u64, &'a u64)>
+    where
+        Self: 'a;
     fn iter(&self) -> Self::Iter<'_>;
 }
 

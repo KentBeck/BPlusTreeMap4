@@ -60,5 +60,3 @@ fn test_linked_list_corruption_causes_data_loss() {
     // Test passed - linked list integrity maintained
     println!("Test passed - linked list integrity verified");
 }
-
-

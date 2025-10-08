@@ -1,5 +1,5 @@
-use core::mem::{align_of, size_of};
 use core::mem::MaybeUninit;
+use core::mem::{align_of, size_of};
 use core::ptr::NonNull;
 
 #[inline]
@@ -67,7 +67,9 @@ impl LeafLayout {
 
         // quick upper bound, ignoring alignment between arrays
         let mut cap_guess = bytes.saturating_sub(after_sib) / (s_k + s_v);
-        if cap_guess > u16::MAX as usize { cap_guess = u16::MAX as usize; }
+        if cap_guess > u16::MAX as usize {
+            cap_guess = u16::MAX as usize;
+        }
 
         let mut best = Self {
             bytes,
@@ -75,7 +77,11 @@ impl LeafLayout {
             max_align,
             hdr_size,
             next_off: sib_off,
-            prev_off: if doubly_linked { Some(sib_off + s_ptr) } else { None },
+            prev_off: if doubly_linked {
+                Some(sib_off + s_ptr)
+            } else {
+                None
+            },
             keys_off: after_sib,
             vals_off: after_sib,
         };
@@ -128,14 +134,22 @@ impl LeafLayout {
 
         let cap_usize = cap as usize;
         let first_is_keys = a_k >= a_v;
-        let (a1, s1, a2, s2) = if first_is_keys { (a_k, s_k, a_v, s_v) } else { (a_v, s_v, a_k, s_k) };
+        let (a1, s1, a2, s2) = if first_is_keys {
+            (a_k, s_k, a_v, s_v)
+        } else {
+            (a_v, s_v, a_k, s_k)
+        };
 
         let first_off = align_up(after_sib, a1);
         let second_off = align_up(first_off + cap_usize * s1, a2);
         let end = second_off + cap_usize * s2;
         let end_aligned = align_up(end, max_align);
 
-        let (keys_off, vals_off) = if first_is_keys { (first_off, second_off) } else { (second_off, first_off) };
+        let (keys_off, vals_off) = if first_is_keys {
+            (first_off, second_off)
+        } else {
+            (second_off, first_off)
+        };
 
         Self {
             bytes: end_aligned,
@@ -143,7 +157,11 @@ impl LeafLayout {
             max_align,
             hdr_size,
             next_off: sib_off,
-            prev_off: if doubly_linked { Some(sib_off + s_ptr) } else { None },
+            prev_off: if doubly_linked {
+                Some(sib_off + s_ptr)
+            } else {
+                None
+            },
             keys_off,
             vals_off,
         }
@@ -167,7 +185,9 @@ impl BranchLayout {
         } else {
             bytes.saturating_sub(hdr_size) / (s_k + s_ptr)
         };
-        if cap_guess > u16::MAX as usize { cap_guess = u16::MAX as usize; }
+        if cap_guess > u16::MAX as usize {
+            cap_guess = u16::MAX as usize;
+        }
 
         // Children usually have higher alignment; place higher-aligned first.
         let children_first = a_ptr >= a_k;
@@ -185,11 +205,19 @@ impl BranchLayout {
         while cap_guess > 0 {
             let first_a = if children_first { a_ptr } else { a_k };
             let first_s = if children_first { s_ptr } else { s_k };
-            let first_len = if children_first { cap_guess + 1 } else { cap_guess };
+            let first_len = if children_first {
+                cap_guess + 1
+            } else {
+                cap_guess
+            };
 
             let second_a = if children_first { a_k } else { a_ptr };
             let second_s = if children_first { s_k } else { s_ptr };
-            let second_len = if children_first { cap_guess } else { cap_guess + 1 };
+            let second_len = if children_first {
+                cap_guess
+            } else {
+                cap_guess + 1
+            };
 
             let first_off = align_up(hdr_size, first_a);
             let second_off = align_up(first_off + first_len * first_s, second_a);
@@ -225,20 +253,39 @@ impl BranchLayout {
         let children_first = a_ptr >= a_k;
         let first_a = if children_first { a_ptr } else { a_k };
         let first_s = if children_first { s_ptr } else { s_k };
-        let first_len = if children_first { cap as usize + 1 } else { cap as usize };
+        let first_len = if children_first {
+            cap as usize + 1
+        } else {
+            cap as usize
+        };
 
         let second_a = if children_first { a_k } else { a_ptr };
         let second_s = if children_first { s_k } else { s_ptr };
-        let second_len = if children_first { cap as usize } else { cap as usize + 1 };
+        let second_len = if children_first {
+            cap as usize
+        } else {
+            cap as usize + 1
+        };
 
         let first_off = align_up(hdr_size, first_a);
         let second_off = align_up(first_off + first_len * first_s, second_a);
         let end = second_off + second_len * second_s;
         let end_aligned = align_up(end, max_align);
 
-        let (children_off, keys_off) = if children_first { (first_off, second_off) } else { (second_off, first_off) };
+        let (children_off, keys_off) = if children_first {
+            (first_off, second_off)
+        } else {
+            (second_off, first_off)
+        };
 
-        Self { bytes: end_aligned, cap, max_align, hdr_size, children_off, keys_off }
+        Self {
+            bytes: end_aligned,
+            cap,
+            max_align,
+            hdr_size,
+            children_off,
+            keys_off,
+        }
     }
 }
 
@@ -275,7 +322,13 @@ pub unsafe fn carve_leaf<K, V>(base: NonNull<u8>, layout: &LeafLayout) -> LeafPa
     let prev_ptr = layout.prev_off.map(|off| p.add(off) as *mut *mut u8);
     let keys_ptr = p.add(layout.keys_off) as *mut MaybeUninit<K>;
     let vals_ptr = p.add(layout.vals_off) as *mut MaybeUninit<V>;
-    LeafParts { hdr, next_ptr, prev_ptr, keys_ptr, vals_ptr }
+    LeafParts {
+        hdr,
+        next_ptr,
+        prev_ptr,
+        keys_ptr,
+        vals_ptr,
+    }
 }
 
 /// Carve a branch node's header, children pointers, and keys array from a raw base pointer.
@@ -285,5 +338,9 @@ pub unsafe fn carve_branch<K>(base: NonNull<u8>, layout: &BranchLayout) -> Branc
     let hdr = p as *mut NodeHdr;
     let children_ptr = p.add(layout.children_off) as *mut MaybeUninit<*mut u8>;
     let keys_ptr = p.add(layout.keys_off) as *mut MaybeUninit<K>;
-    BranchParts { hdr, children_ptr, keys_ptr }
+    BranchParts {
+        hdr,
+        children_ptr,
+        keys_ptr,
+    }
 }

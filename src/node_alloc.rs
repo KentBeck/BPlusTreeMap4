@@ -37,7 +37,14 @@ pub unsafe fn alloc_leaf_block(layout: &LeafLayout) -> Option<NonNull<u8>> {
 pub unsafe fn init_leaf_block(base: NonNull<u8>, layout: &LeafLayout) {
     // Header
     let hdr = base.as_ptr() as *mut NodeHdr;
-    ptr::write(hdr, NodeHdr { tag: NodeTag::Leaf, len: 0, flags: 0 });
+    ptr::write(
+        hdr,
+        NodeHdr {
+            tag: NodeTag::Leaf,
+            len: 0,
+            flags: 0,
+        },
+    );
 
     // Sibling pointers set to null by default
     let parts = carve_leaf::<(), ()>(base, layout);
@@ -59,5 +66,12 @@ pub unsafe fn alloc_branch_block(layout: &BranchLayout) -> Option<NonNull<u8>> {
 #[inline]
 pub unsafe fn init_branch_block(base: NonNull<u8>) {
     let hdr = base.as_ptr() as *mut NodeHdr;
-    ptr::write(hdr, NodeHdr { tag: NodeTag::Branch, len: 0, flags: 0 });
+    ptr::write(
+        hdr,
+        NodeHdr {
+            tag: NodeTag::Branch,
+            len: 0,
+            flags: 0,
+        },
+    );
 }
