@@ -3,7 +3,7 @@ use std::hint::black_box;
 
 fn main() {
     // Profile insert-heavy workload with std::BTreeMap
-    let n = 1_000_000;
+    let n = 10_000_000; // Match profile_insert.rs
 
     println!("Profiling {} inserts with std::BTreeMap", n);
 

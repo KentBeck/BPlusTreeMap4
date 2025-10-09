@@ -2,8 +2,8 @@ use bplustree::BPlusTreeMap;
 use std::hint::black_box;
 
 fn main() {
-    // Profile insert-heavy workload
-    let n = 1_000_000;
+    // Profile insert-heavy workload with much larger dataset
+    let n = 10_000_000; // 10M inserts for better profiling
     let cap = 128;
 
     println!("Profiling {} inserts with capacity {}", n, cap);
