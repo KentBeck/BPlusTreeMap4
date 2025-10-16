@@ -1,6 +1,5 @@
 use alloc::vec::Vec;
 use alloc::vec::IntoIter;
-use core::marker::PhantomData;
 use core::ops::{Bound, RangeBounds};
 use core::ptr::NonNull;
 
@@ -15,6 +14,9 @@ pub enum ItemsInner<'a, K, V> {
         back_leaf: Option<NonNull<u8>>,
         back_idx: usize,
         remaining: usize,
+        start_bound: Bound<K>,
+        end_bound: Bound<K>,
+        initialized: bool,
     },
     Vec {
         inner: IntoIter<(&'a K, &'a V)>,
@@ -25,7 +27,7 @@ pub struct Items<'a, K, V> {
     pub(crate) inner: ItemsInner<'a, K, V>,
 }
 
-impl<'a, K, V> Iterator for Items<'a, K, V> {
+impl<'a, K: Ord, V> Iterator for Items<'a, K, V> {
     type Item = (&'a K, &'a V);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -35,12 +37,62 @@ impl<'a, K, V> Iterator for Items<'a, K, V> {
                 front_leaf,
                 front_idx,
                 remaining,
+                start_bound,
+                end_bound,
+                initialized,
                 ..
             } => {
-                if *remaining == 0 {
-                    return None;
+                // Lazy initialization on first call
+                if !*initialized {
+                    *initialized = true;
+                    let is_excluded = matches!(start_bound, Bound::Excluded(_));
+                    match start_bound {
+                        Bound::Unbounded => {
+                            *front_leaf = tree.leftmost_leaf();
+                            *front_idx = 0;
+                        }
+                        Bound::Included(k) | Bound::Excluded(k) => {
+                            let leaf_opt = tree.leaf_for_key(k);
+                            if let Some(leaf) = leaf_opt {
+                                unsafe {
+                                    let parts = layout::carve_leaf::<K, V>(leaf, &tree.leaf_layout);
+                                    let len = (*parts.hdr).len as usize;
+                                    let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
+                                    
+                                    match keys.binary_search(k) {
+                                        Ok(i) => {
+                                            let idx = if is_excluded { i + 1 } else { i };
+                                            if idx >= len {
+                                                // Move to next leaf
+                                                let next_ptr = *parts.next_ptr;
+                                                *front_leaf = NonNull::new(next_ptr);
+                                                *front_idx = 0;
+                                            } else {
+                                                *front_leaf = Some(leaf);
+                                                *front_idx = idx;
+                                            }
+                                        }
+                                        Err(i) => {
+                                            if i >= len {
+                                                // Move to next leaf
+                                                let next_ptr = *parts.next_ptr;
+                                                *front_leaf = NonNull::new(next_ptr);
+                                                *front_idx = 0;
+                                            } else {
+                                                *front_leaf = Some(leaf);
+                                                *front_idx = i;
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                *front_leaf = None;
+                                *front_idx = 0;
+                            }
+                        }
+                    }
                 }
-
+                
                 let leaf = (*front_leaf)?;
                 unsafe {
                     let parts = layout::carve_leaf::<K, V>(leaf, &tree.leaf_layout);
@@ -48,9 +100,25 @@ impl<'a, K, V> Iterator for Items<'a, K, V> {
 
                     if *front_idx < len {
                         let k = &*(parts.keys_ptr.add(*front_idx) as *const K);
+                        
+                        // Check end bound
+                        let within_bound = match end_bound {
+                            Bound::Unbounded => true,
+                            Bound::Included(e) => k <= e,
+                            Bound::Excluded(e) => k < e,
+                        };
+                        
+                        if !within_bound {
+                            *front_leaf = None;
+                            *remaining = 0;
+                            return None;
+                        }
+                        
                         let v = &*(parts.vals_ptr.add(*front_idx) as *const V);
                         *front_idx += 1;
-                        *remaining -= 1;
+                        if *remaining > 0 {
+                            *remaining -= 1;
+                        }
                         return Some((k, v));
                     }
 
@@ -73,13 +141,20 @@ impl<'a, K, V> Iterator for Items<'a, K, V> {
 
     fn size_hint(&self) -> (usize, Option<usize>) {
         match &self.inner {
-            ItemsInner::Lazy { remaining, .. } => (*remaining, Some(*remaining)),
+            ItemsInner::Lazy { remaining, initialized, .. } => {
+                if *initialized && *remaining > 0 {
+                    (*remaining, Some(*remaining))
+                } else {
+                    // Uninitialized or unknown size
+                    (0, None)
+                }
+            }
             ItemsInner::Vec { inner } => inner.size_hint(),
         }
     }
 }
 
-impl<'a, K, V> DoubleEndedIterator for Items<'a, K, V> {
+impl<'a, K: Ord, V> DoubleEndedIterator for Items<'a, K, V> {
     fn next_back(&mut self) -> Option<<Self as Iterator>::Item> {
         match &mut self.inner {
             ItemsInner::Lazy {
@@ -87,12 +162,9 @@ impl<'a, K, V> DoubleEndedIterator for Items<'a, K, V> {
                 back_leaf,
                 back_idx,
                 remaining,
+                start_bound,
                 ..
             } => {
-                if *remaining == 0 {
-                    return None;
-                }
-
                 let leaf = (*back_leaf)?;
                 unsafe {
                     let parts = layout::carve_leaf::<K, V>(leaf, &tree.leaf_layout);
@@ -100,8 +172,24 @@ impl<'a, K, V> DoubleEndedIterator for Items<'a, K, V> {
                     if *back_idx > 0 {
                         *back_idx -= 1;
                         let k = &*(parts.keys_ptr.add(*back_idx) as *const K);
+                        
+                        // Check start bound
+                        let within_bound = match start_bound {
+                            Bound::Unbounded => true,
+                            Bound::Included(s) => k >= s,
+                            Bound::Excluded(s) => k > s,
+                        };
+                        
+                        if !within_bound {
+                            *back_leaf = None;
+                            *remaining = 0;
+                            return None;
+                        }
+                        
                         let v = &*(parts.vals_ptr.add(*back_idx) as *const V);
-                        *remaining -= 1;
+                        if *remaining > 0 {
+                            *remaining -= 1;
+                        }
                         return Some((k, v));
                     }
 
@@ -131,7 +219,7 @@ pub struct Keys<'a, K, V> {
     pub(crate) inner: Items<'a, K, V>,
 }
 
-impl<'a, K, V> Iterator for Keys<'a, K, V> {
+impl<'a, K: Ord, V> Iterator for Keys<'a, K, V> {
     type Item = &'a K;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -143,7 +231,7 @@ impl<'a, K, V> Iterator for Keys<'a, K, V> {
     }
 }
 
-impl<'a, K, V> DoubleEndedIterator for Keys<'a, K, V> {
+impl<'a, K: Ord, V> DoubleEndedIterator for Keys<'a, K, V> {
     fn next_back(&mut self) -> Option<Self::Item> {
         self.inner.next_back().map(|(k, _)| k)
     }
@@ -153,7 +241,7 @@ pub struct Values<'a, K, V> {
     pub(crate) inner: Items<'a, K, V>,
 }
 
-impl<'a, K, V> Iterator for Values<'a, K, V> {
+impl<'a, K: Ord, V> Iterator for Values<'a, K, V> {
     type Item = &'a V;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -165,7 +253,7 @@ impl<'a, K, V> Iterator for Values<'a, K, V> {
     }
 }
 
-impl<'a, K, V> DoubleEndedIterator for Values<'a, K, V> {
+impl<'a, K: Ord, V> DoubleEndedIterator for Values<'a, K, V> {
     fn next_back(&mut self) -> Option<Self::Item> {
         self.inner.next_back().map(|(_, v)| v)
     }
@@ -183,6 +271,9 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
                     back_leaf: None,
                     back_idx: 0,
                     remaining: 0,
+                    start_bound: Bound::Unbounded,
+                    end_bound: Bound::Unbounded,
+                    initialized: true,
                 },
             };
         }
@@ -206,6 +297,9 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
                 back_leaf,
                 back_idx,
                 remaining: len,
+                start_bound: Bound::Unbounded,
+                end_bound: Bound::Unbounded,
+                initialized: true,
             },
         }
     }
@@ -235,15 +329,108 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
     }
 
     pub fn range<R: RangeBounds<K>>(&self, r: R) -> Items<'_, K, V> {
-        // TODO: Implement lazy range iteration
-        // For now, collect into Vec (old implementation)
+        let start_bound = r.start_bound();
+        let end_bound = r.end_bound();
+        
         Items {
-            inner: ItemsInner::Vec {
-                inner: self
-                    .collect_range_bounds(r.start_bound(), r.end_bound())
-                    .into_iter(),
+            inner: ItemsInner::Lazy {
+                tree: self,
+                front_leaf: None,
+                front_idx: 0,
+                back_leaf: None,
+                back_idx: 0,
+                remaining: 0, // Unknown for ranges, size_hint will return (0, None)
+                start_bound: Self::clone_bound(start_bound),
+                end_bound: Self::clone_bound(end_bound),
+                initialized: false,
             },
         }
+    }
+    
+    fn clone_bound(bound: Bound<&K>) -> Bound<K> {
+        match bound {
+            Bound::Unbounded => Bound::Unbounded,
+            Bound::Included(k) => Bound::Included(k.clone()),
+            Bound::Excluded(k) => Bound::Excluded(k.clone()),
+        }
+    }
+    
+    fn find_range_start(&self, key: &K, excluded: bool) -> (Option<NonNull<u8>>, usize) {
+        let leaf = self.leaf_for_key(key);
+        if leaf.is_none() {
+            return (None, 0);
+        }
+        
+        let leaf = leaf.unwrap();
+        unsafe {
+            let parts = layout::carve_leaf::<K, V>(leaf, &self.leaf_layout);
+            let len = (*parts.hdr).len as usize;
+            let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
+            
+            match self.binary_search_keys(keys, key) {
+                Ok(i) => {
+                    let idx = if excluded { i + 1 } else { i };
+                    if idx >= len {
+                        // Move to next leaf
+                        let next_ptr = *parts.next_ptr;
+                        if next_ptr.is_null() {
+                            (None, 0)
+                        } else {
+                            (NonNull::new(next_ptr), 0)
+                        }
+                    } else {
+                        (Some(leaf), idx)
+                    }
+                }
+                Err(i) => {
+                    if i >= len {
+                        // Move to next leaf
+                        let next_ptr = *parts.next_ptr;
+                        if next_ptr.is_null() {
+                            (None, 0)
+                        } else {
+                            (NonNull::new(next_ptr), 0)
+                        }
+                    } else {
+                        (Some(leaf), i)
+                    }
+                }
+            }
+        }
+    }
+    
+    fn find_range_end(&self, key: &K, included: bool) -> (Option<NonNull<u8>>, usize) {
+        let leaf = self.leaf_for_key(key);
+        if leaf.is_none() {
+            return (None, 0);
+        }
+        
+        let leaf = leaf.unwrap();
+        unsafe {
+            let parts = layout::carve_leaf::<K, V>(leaf, &self.leaf_layout);
+            let len = (*parts.hdr).len as usize;
+            let keys = core::slice::from_raw_parts(parts.keys_ptr as *const K, len);
+            
+            match self.binary_search_keys(keys, key) {
+                Ok(i) => {
+                    let idx = if included { i + 1 } else { i };
+                    (Some(leaf), idx)
+                }
+                Err(i) => (Some(leaf), i),
+            }
+        }
+    }
+    
+    fn estimate_range_count(
+        &self,
+        _front_leaf: Option<NonNull<u8>>,
+        _front_idx: usize,
+        _back_leaf: Option<NonNull<u8>>,
+        _back_idx: usize,
+    ) -> usize {
+        // Conservative estimate: just return total length
+        // The actual count will be determined by bound checking during iteration
+        self.len()
     }
 
     pub fn first(&self) -> Option<(&K, &V)> {

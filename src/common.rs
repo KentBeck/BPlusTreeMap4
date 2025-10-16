@@ -120,7 +120,7 @@ impl<K, V> BPlusTreeMap<K, V> {
     }
 }
 
-impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
+impl<K: Ord, V> BPlusTreeMap<K, V> {
     #[inline(always)]
     pub(crate) unsafe fn child_for_key(
         &self,
@@ -178,6 +178,9 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
             }
         }
     }
+}
+
+impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
 
     #[inline]
     pub(crate) fn rightmost_leaf(&self) -> Option<NonNull<u8>> {
