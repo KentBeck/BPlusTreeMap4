@@ -179,6 +179,28 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         }
     }
 
+    #[inline]
+    pub(crate) fn rightmost_leaf(&self) -> Option<NonNull<u8>> {
+        let mut cur = self.root?;
+        unsafe {
+            loop {
+                let hdr = &*(cur.as_ptr() as *const NodeHdr);
+                match hdr.tag {
+                    NodeTag::Leaf => return Some(cur),
+                    NodeTag::Branch => {
+                        let b = layout::carve_branch::<K>(cur, &self.branch_layout);
+                        let len = (*b.hdr).len as usize;
+                        let child_ptr = *(b.children_ptr.add(len) as *const *mut u8);
+                        if child_ptr.is_null() {
+                            return None;
+                        }
+                        cur = NonNull::new_unchecked(child_ptr);
+                    }
+                }
+            }
+        }
+    }
+
     pub fn is_leaf_root(&self) -> bool {
         match self.root {
             None => true,

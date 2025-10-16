@@ -52,3 +52,15 @@ path = "src/bin/profile_get_std.rs"
 [[bin]]
 name = "profile_get_small"
 path = "src/bin/profile_get_small.rs"
+
+[[bin]]
+name = "bench_iterate"
+path = "src/bin/bench_iterate.rs"
+
+[[bin]]
+name = "profile_iterate"
+path = "src/bin/profile_iterate.rs"
+
+[[bin]]
+name = "profile_iterate_std"
+path = "src/bin/profile_iterate_std.rs"
