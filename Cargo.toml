@@ -16,3 +16,23 @@ default = ["std", "compat_test_api"]
 std = []
 # Enables test-only compatibility APIs used by the imported test suites.
 compat_test_api = []
+
+[[bin]]
+name = "profile_delete"
+path = "src/bin/profile_delete.rs"
+
+[[bin]]
+name = "profile_delete_std"
+path = "src/bin/profile_delete_std.rs"
+
+[[bin]]
+name = "bench_delete"
+path = "src/bin/bench_delete.rs"
+
+[[bin]]
+name = "profile_delete_detailed"
+path = "src/bin/profile_delete_detailed.rs"
+
+[[bin]]
+name = "profile_delete_small"
+path = "src/bin/profile_delete_small.rs"

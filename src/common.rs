@@ -94,10 +94,34 @@ impl<K, V> BPlusTreeMap<K, V> {
         core::ptr::write_bytes(src_keys_ptr.add(src_idx), 0, 1);
         core::ptr::write_bytes(src_vals_ptr.add(src_idx), 0, 1);
     }
+
+    /// Shift key-value pairs left by one position (used after deletion).
+    /// This batches the key and value copy operations together.
+    #[inline(always)]
+    pub(crate) unsafe fn shift_left_kv(
+        &self,
+        keys_ptr: *mut K,
+        vals_ptr: *mut V,
+        start_idx: usize,
+        count: usize,
+    ) {
+        if count > 0 {
+            core::ptr::copy(
+                keys_ptr.add(start_idx + 1) as *const K,
+                keys_ptr.add(start_idx) as *mut K,
+                count,
+            );
+            core::ptr::copy(
+                vals_ptr.add(start_idx + 1) as *const V,
+                vals_ptr.add(start_idx) as *mut V,
+                count,
+            );
+        }
+    }
 }
 
 impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
-    #[inline]
+    #[inline(always)]
     pub(crate) unsafe fn child_for_key(
         &self,
         branch: NonNull<u8>,
@@ -114,7 +138,7 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         NonNull::new(child_ptr).map(|child| (child, child_idx))
     }
 
-    #[inline]
+    #[inline(always)]
     pub(crate) fn leaf_for_key(&self, key: &K) -> Option<NonNull<u8>> {
         let mut cur = self.root?;
         unsafe {
@@ -396,13 +420,13 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         })
     }
 
-    #[inline]
+    #[inline(always)]
     pub(crate) fn min_leaf_len(&self) -> usize {
         let cap = self.leaf_layout.cap as usize;
         cap / 2
     }
 
-    #[inline]
+    #[inline(always)]
     pub(crate) fn min_branch_len(&self) -> usize {
         let cap = self.branch_layout.cap as usize;
         if cap <= 2 {

@@ -6,7 +6,16 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         let root = self.root?;
         let result = unsafe { self.remove_rec(root, key) };
         if result.is_some() {
-            unsafe { self.check_root_collapse() };
+            // Only check root collapse if root is a branch with few children
+            // This avoids unnecessary checks when root is a leaf or has many children
+            unsafe {
+                if let Some(root) = self.root {
+                    let hdr = &*(root.as_ptr() as *const NodeHdr);
+                    if hdr.tag == NodeTag::Branch && (*hdr).len <= 2 {
+                        self.check_root_collapse();
+                    }
+                }
+            }
         }
         result
     }
@@ -690,16 +699,12 @@ impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
         let removed_key = core::ptr::read((parts.keys_ptr as *const K).add(idx));
         let value = core::ptr::read(parts.vals_ptr.add(idx) as *const V);
 
-        // Shift remaining elements
+        // Shift remaining elements using batched operation
         if idx < len - 1 {
-            core::ptr::copy(
-                parts.keys_ptr.add(idx + 1) as *const K,
-                parts.keys_ptr.add(idx) as *mut K,
-                len - idx - 1,
-            );
-            core::ptr::copy(
-                parts.vals_ptr.add(idx + 1) as *const V,
-                parts.vals_ptr.add(idx) as *mut V,
+            self.shift_left_kv(
+                parts.keys_ptr as *mut K,
+                parts.vals_ptr as *mut V,
+                idx,
                 len - idx - 1,
             );
         }
