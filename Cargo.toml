@@ -36,3 +36,19 @@ path = "src/bin/profile_delete_detailed.rs"
 [[bin]]
 name = "profile_delete_small"
 path = "src/bin/profile_delete_small.rs"
+
+[[bin]]
+name = "bench_get"
+path = "src/bin/bench_get.rs"
+
+[[bin]]
+name = "profile_get"
+path = "src/bin/profile_get.rs"
+
+[[bin]]
+name = "profile_get_std"
+path = "src/bin/profile_get_std.rs"
+
+[[bin]]
+name = "profile_get_small"
+path = "src/bin/profile_get_small.rs"
