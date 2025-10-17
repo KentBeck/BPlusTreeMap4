@@ -16,7 +16,7 @@ We analyzed how much time insert/delete operations spend in memory copy (memmove
 - ⚠️ **Room for optimization** - The implementation is not yet at peak efficiency
 - ⚠️ **Tree traversal and bookkeeping dominate** - These are the real bottlenecks
 
-**Industry benchmark:** Well-optimized B-tree implementations typically spend 30-50% of time in memmove when they're properly optimized and approaching memory bandwidth limits.
+**What this suggests:** Well-optimized B-tree implementations that are memory-bandwidth limited would spend significantly more time in memmove operations. Our low percentage suggests we're CPU-bound with optimization opportunities.
 
 ---
 
@@ -89,29 +89,23 @@ Based on profiling and code analysis, the non-memmove overhead comes from:
 
 ## Comparison with Well-Optimized Implementations
 
-### Industry Benchmarks
+### What Low Memmove Percentage Indicates
 
-Well-optimized B-tree implementations typically show:
+**Hypothesis:** Well-optimized, memory-bandwidth-limited B-tree implementations would spend a much higher percentage of time in memmove operations (exact numbers unknown, but likely >30%).
 
-| Implementation | Memmove % | Notes |
-|----------------|-----------|-------|
-| **sqlite B-tree** | 35-45% | Highly optimized, memory-bandwidth limited |
-| **LMDB B+ tree** | 30-40% | Focus on minimal CPU overhead |
-| **PostgreSQL B-tree** | 25-35% | Balance of features and performance |
-| **BPlusTreeMap (current)** | **8-10%** | **High CPU overhead - room for improvement** |
+**Reasoning:**
+- If CPU overhead (traversal, allocation, bookkeeping) is minimized through optimization
+- And the fundamental work of a B-tree involves moving data within nodes
+- Then memory operations would dominate the runtime
+- This would indicate the implementation is hitting hardware limits rather than software inefficiencies
 
-### What This Tells Us
-
-**Good implementations spend more time in memmove** because they've:
-1. Minimized tree traversal overhead
-2. Optimized hot paths
-3. Reduced unnecessary operations
-4. Are approaching memory bandwidth limits
-
-**Our current state:**
-- Only 8-10% in memmove means we're **CPU-bound, not memory-bound**
+**Our current state at 8-10% memmove:**
+- Strongly suggests we're **CPU-bound, not memory-bound**
 - There's **significant room for optimization** in the 90% overhead
 - We're not yet hitting fundamental memory bandwidth limits
+- Most time is spent in overhead that could potentially be reduced
+
+**Note:** Without access to profiling data from other B-tree implementations, we cannot make specific numerical comparisons. The key insight is the ratio itself: spending only 8-10% of time on the actual data movement work suggests optimization potential in the other 90%.
 
 ---
 
@@ -179,19 +173,20 @@ Well-optimized B-tree implementations typically show:
 
 ---
 
-### Why Not Just Accept Current Performance?
+### Performance Improvement Potential
 
 **Current performance:** 121.5ns per insert, 120.6ns per delete
 
-**Industry comparison:**
-- sqlite: ~60-80ns per operation (2x faster)
-- LMDB: ~50-70ns per operation (2.4x faster)
-- PostgreSQL: ~70-90ns per operation (1.7x faster)
+**With optimizations targeting the 90% overhead, we could potentially achieve:**
+- Optimistic: ~60-70ns per operation (2x faster) - if we reduce overhead dramatically
+- Realistic: ~80-90ns per operation (1.5x faster) - with focused optimization effort
+- Conservative: ~95-100ns per operation (1.25x faster) - with quick wins only
 
-**With optimizations, we could achieve:**
-- Optimistic: ~60-70ns per operation (2x faster)
-- Realistic: ~80-90ns per operation (1.5x faster)
-- Conservative: ~95-100ns per operation (1.25x faster)
+**Theoretical lower bound:**
+- If we could reduce CPU overhead to near-zero, we'd be limited by the ~10ns memmove time
+- Realistically, some overhead is unavoidable (tree traversal, comparisons, etc.)
+- A well-optimized implementation might spend 30-40% on CPU overhead and 60-70% on memmove
+- This suggests a theoretical best case of ~20-30ns per operation (4x faster)
 
 ---
 
