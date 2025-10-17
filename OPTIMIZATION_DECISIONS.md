@@ -50,32 +50,48 @@ This document records optimization decisions for BPlusTreeMap's partial iteratio
 
 ---
 
-## 🔄 NEXT OPTIMIZATION
+## ❌ NOT PURSUING (Attempted but not beneficial)
 
 ### 2. Hoist Bound Checking to Per-Leaf
 
-**Status:** 🔄 NEXT TASK
+**Status:** ❌ ATTEMPTED - NOT BENEFICIAL
 
-**What we'll do:**
+**What we tried:**
 - Check end bound once per leaf instead of per item
-- Reduces 2-5ns overhead per item for bounded ranges
-- Only affects bounded range queries
+- Added `front_leaf_end` field to cache end index
+- Binary search in leaf to find end boundary
 
-**Expected impact:**
-- 10-20% faster for bounded ranges
-- 5-10% overall improvement for bounded scenarios
-- No impact on unbounded ranges
+**Why we abandoned it:**
+- **Added complexity:** Required new field and initialization logic
+- **Initialization overhead increased:** 537ns → 669ns (+25% worse)
+- **Per-item cost increased:** Bounded ranges 7.45ns → 11.07ns (+48% worse)
+- **Sentinel value management:** Required usize::MAX sentinel and complex state tracking
+- **Edge case complexity:** Handling initialization with non-zero front_idx was tricky
 
-**Complexity:** Medium
-**Effort:** 1-2 days
-**Trade-off:** Slightly more complex logic
+**What we learned:**
+- The original per-item bound check (2-5ns) is already very cheap
+- Compiler optimizes the match statement well
+- Adding state to avoid cheap operations can backfire
+- Per-leaf binary search overhead > per-item comparison savings
 
-**Decision:** PROCEED with this optimization.
+**Measurements:**
+```
+Before (recursion elimination only):
+- First next(): 537ns
+- Bounded range: 7.45ns/item
+
+After (with bound hoisting):
+- First next(): 669ns (+25% worse)
+- Bounded range: 11.07ns/item (+48% worse)
+```
+
+**Decision:** DO NOT implement bound hoisting. Current implementation is better.
 
 **Rationale:**
-- Clear performance benefit for bounded ranges
-- Well-scoped change with measurable impact
-- No dependencies on external data
+- Current per-item checking is already very efficient
+- Added complexity not worth marginal theoretical gains
+- Actual measurements showed regression, not improvement
+- Simple code is better than complex optimizations that don't help
 
 ---
 
@@ -322,15 +338,18 @@ struct PartialIterationMetrics {
 
 **Current state:** Production-ready, 2-5.7x faster than std::BTreeMap
 
-**Active work:** Hoisting bound checking (next optimization)
+**Completed optimizations:**
+- ✅ Recursion elimination (10-26% improvement)
 
-**Not pursuing:** Specialized unbounded iterator (not worth complexity)
+**Not pursuing:**
+- ❌ Specialized unbounded iterator (not worth complexity)
+- ❌ Bound hoisting (attempted, made things worse)
 
 **Blocked:** Iterator position caching (needs production data)
 
-**Philosophy:** Optimize based on data, not speculation. Keep code simple and maintainable.
+**Philosophy:** Optimize based on data, not speculation. Keep code simple and maintainable. Abandon optimizations that don't help in practice.
 
 ---
 
 **Last Updated:** October 17, 2025  
-**Next Review:** After bound hoisting implementation
+**Next Review:** After production deployment and metrics collection

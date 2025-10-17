@@ -111,11 +111,11 @@ HIGH PRIORITY (Do First):
    Trade-off:  None (pure win)
    Status:     DONE - Committed October 17, 2025
 
-2. Hoist Bound Checking to Per-Leaf
+2. ❌ ABANDONED - Hoist Bound Checking to Per-Leaf
    Effort:     1-2 days (Medium)
-   Impact:     10-20% for bounded ranges
-   Trade-off:  More complex logic
-   Status:     NEXT ⭐⭐⭐
+   Impact:     NEGATIVE (made things 25-48% worse)
+   Trade-off:  Added complexity, state management overhead
+   Status:     ATTEMPTED - NOT BENEFICIAL
 
 MEDIUM PRIORITY (Nice to Have):
 
@@ -145,10 +145,11 @@ ACHIEVED (Recursion Elimination):
   Random Positions:   1.4x → 2.1x faster (+46% achieved) ✅
   Cursor-like:        1.1x → 2.0x faster (+75% achieved) ✅
 
-CONSERVATIVE (Bound Hoisting):
-  From Middle:        5.7x → 6.0x faster (additional +5%)
-  Random Positions:   2.1x → 2.3x faster (additional +10%)
-  Cursor-like:        2.0x → 2.1x faster (additional +5%)
+FINAL STATUS (After all attempted optimizations):
+  ✅ Production-ready: 2.0-5.7x faster than std::BTreeMap
+  ✅ Per-item cost: 2.56ns (memory bandwidth limited)
+  ✅ Initialization: 537ns (down from 704ns original)
+  ❌ No further optimizations beneficial without production data
 
 ================================================================================
 IMPLEMENTATION ROADMAP
@@ -159,20 +160,20 @@ Phase 1: Quick Wins (COMPLETED ✅)
   ✅ Benchmark and validate improvements
   ✅ Comprehensive documentation
 
-Phase 2: Targeted Optimization (Current)
-  🔄 Hoist bound checking to per-leaf (next task)
-  • Cache leaf_parts in iterator state
-  • Profile and micro-optimize hot paths
+Phase 2: Attempted Optimizations (COMPLETED ❌)
+  ❌ Hoist bound checking to per-leaf - Made things worse, abandoned
+  ✅ Decision: Current implementation is optimal without production data
 
-Phase 3: Data-Driven Future Work (Requires Production Data)
+Phase 3: Data-Driven Future Work (BLOCKED - Requires Production Data)
   ⏸️ Iterator position caching - BLOCKED: Need production key distribution data
-  ⏸️ Specialized unbounded iterator - DECISION: Not pursuing (not needed)
-  • Evaluate based on real-world usage patterns
+  ❌ Specialized unbounded iterator - DECISION: Not pursuing (not needed)
+  ⏸️ Any further optimizations - Deploy and collect metrics first
 
-Phase 4: Advanced (Optional, Future)
-  • Add prefetching hints
-  • Experiment with SIMD search
-  • Architecture-specific optimizations
+Phase 4: Production Deployment
+  📋 Deploy current implementation to production
+  📊 Collect usage metrics and key access patterns
+  📈 Monitor performance in real-world scenarios
+  🔄 Reassess optimization opportunities with actual data
 
 ================================================================================
 CURRENT STATUS
@@ -180,17 +181,19 @@ CURRENT STATUS
 
 ✅ Production-ready and 2.0-5.7x faster than std::BTreeMap
 ✅ Phase 1 complete: Recursion eliminated (10-26% improvement)
+✅ Phase 2 complete: Bound hoisting attempted and abandoned (made things worse)
 ✅ Excellent per-item performance (2.56ns within leaf)
-✅ 537ns initialization overhead (down from 704ns)
-🔄 Phase 2 in progress: Hoisting bound checking
+✅ 537ns initialization overhead (down from 704ns original)
+✅ All attempted optimizations evaluated
 
 Decisions Made:
   ❌ Specialized unbounded iterator - Not pursuing (not needed)
+  ❌ Bound hoisting - Attempted, made things worse, abandoned
   ⏸️ Iterator position caching - Blocked until production data available
-  ✅ Bound hoisting - Next optimization target
+  ⏸️ All other optimizations - Blocked until production metrics available
 
-Recommendation: Complete bound hoisting optimization, then monitor production
-usage patterns before pursuing additional optimizations.
+Recommendation: Deploy current implementation to production and collect usage
+metrics. No further optimization beneficial without real-world data.
 
 ================================================================================
 DETAILED ANALYSIS
