@@ -181,7 +181,6 @@ impl<K: Ord, V> BPlusTreeMap<K, V> {
 }
 
 impl<K: Ord + Clone, V> BPlusTreeMap<K, V> {
-
     #[inline]
     pub(crate) fn rightmost_leaf(&self) -> Option<NonNull<u8>> {
         let mut cur = self.root?;

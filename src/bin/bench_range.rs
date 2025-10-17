@@ -47,7 +47,10 @@ fn main() {
     let n = 1_000_000;
 
     println!("Range Benchmark (n={})", n);
-    println!("{:<20} {:<15} {:<15} {:<10}", "Range Size", "BPlusTree", "std::BTree", "Speedup");
+    println!(
+        "{:<20} {:<15} {:<15} {:<10}",
+        "Range Size", "BPlusTree", "std::BTree", "Speedup"
+    );
     println!("{}", "=".repeat(65));
 
     let configs = vec![

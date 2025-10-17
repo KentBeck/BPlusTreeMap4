@@ -25,11 +25,13 @@ fn main() {
 
     // Phase 2: Delete all items (this is what we're profiling)
     println!("Phase 2: Deleting {} items...", n);
-    
+
     // Shuffle keys for more realistic delete pattern
     let mut delete_state: u64 = 0xfedcba9876543210;
     for i in 0..n {
-        delete_state = delete_state.wrapping_mul(6364136223846793005).wrapping_add(1);
+        delete_state = delete_state
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1);
         let j = (delete_state as usize) % (n - i);
         keys.swap(i, i + j);
     }

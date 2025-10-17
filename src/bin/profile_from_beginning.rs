@@ -32,10 +32,8 @@ fn main() {
     // Warmup
     println!("Warming up...");
     for _ in 0..100 {
-        let mut count = 0;
         for (k, v) in map.items().take(iter_count) {
             black_box((k, v));
-            count += 1;
         }
     }
 

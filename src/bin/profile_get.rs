@@ -27,7 +27,9 @@ fn main() {
     println!("Phase 2: Shuffling keys...");
     let mut lookup_state: u64 = 0xfedcba9876543210;
     for i in 0..n {
-        lookup_state = lookup_state.wrapping_mul(6364136223846793005).wrapping_add(1);
+        lookup_state = lookup_state
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1);
         let j = (lookup_state as usize) % (n - i);
         keys.swap(i, i + j);
     }

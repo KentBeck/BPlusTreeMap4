@@ -24,4 +24,3 @@ fn main() {
     // Keep the map alive so it doesn't get optimized away
     black_box(map);
 }
-

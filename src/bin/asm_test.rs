@@ -12,11 +12,11 @@ fn iterate_range(map: &BPlusTreeMap<i32, i32>, start: i32, end: i32) -> u64 {
 
 fn main() {
     let mut map = BPlusTreeMap::with_cache_lines(2, 2);
-    
+
     for i in 0..1000 {
         map.insert(i, i * 2);
     }
-    
+
     let result = iterate_range(&map, 100, 200);
     black_box(result);
 }
