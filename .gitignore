@@ -3,3 +3,8 @@ vendor/
 logs/
 **/*.rs.bk
 .DS_Store
+-e 
+# Profiling output
+*.trace/
+profile_*.txt
+profile_*.json
