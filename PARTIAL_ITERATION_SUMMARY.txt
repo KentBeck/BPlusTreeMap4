@@ -14,7 +14,6 @@
   Random Positions (100×100)  0.090ms         0.099ms          1.11x FASTER ✓
   Cursor-like (1000×10)       0.261ms         0.368ms          1.41x FASTER ✓
   From Middle                 0.002ms         0.008ms          3.98x FASTER ✓
-  From End                    38.4ms          33.7ms           1.14x slower
   From Beginning (items())    38-40ms         0.007ms          5,000x slower ⚠️
 
 ╠═══════════════════════════════════════════════════════════════════════════

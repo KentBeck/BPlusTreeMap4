@@ -64,15 +64,9 @@ fn main() {
     let std_middle = bench_partial_iter_from_key(&std_map, middle_key, iter_count);
     print_results("From Middle", bplus_middle, std_middle, iter_count);
 
-    // Benchmark 3: Iterate from end (last N items)
-    println!("\n--- Scenario 3: Iterate last {} items ---", iter_count);
-    let bplus_end = bench_partial_iter_end(&bplus, iter_count);
-    let std_end = bench_partial_iter_end(&std_map, iter_count);
-    print_results("From End", bplus_end, std_end, iter_count);
-
-    // Benchmark 4: Multiple small iterations at random positions
+    // Benchmark 3: Multiple small iterations at random positions
     println!(
-        "\n--- Scenario 4: 100 random partial iterations of {} items each ---",
+        "\n--- Scenario 3: 100 random partial iterations of {} items each ---",
         iter_count
     );
     let random_keys = generate_random_keys(&dataset, 100);
@@ -85,10 +79,10 @@ fn main() {
         iter_count * 100,
     );
 
-    // Benchmark 5: Very small iterations (simulate cursor-like behavior)
+    // Benchmark 4: Very small iterations (simulate cursor-like behavior)
     let tiny_count = 10;
     println!(
-        "\n--- Scenario 5: 1000 tiny iterations of {} items each (cursor simulation) ---",
+        "\n--- Scenario 4: 1000 tiny iterations of {} items each (cursor simulation) ---",
         tiny_count
     );
     let cursor_keys = generate_random_keys(&dataset, 1000);
@@ -158,28 +152,6 @@ where
     }
     let elapsed = start.elapsed();
     black_box(n);
-    elapsed
-}
-
-fn bench_partial_iter_end<M>(map: &M, count: usize) -> Duration
-where
-    M: IterableBenchmark,
-{
-    let mut n = 0;
-
-    // Get total count first (outside timing for fair comparison)
-    let total = map.iter().count();
-
-    // Time the actual iteration
-    let timing_start = Instant::now();
-    for (k, v) in map.iter().skip(total.saturating_sub(count)) {
-        black_box((k, v));
-        n += 1;
-    }
-    let elapsed = timing_start.elapsed();
-    black_box(n);
-
-    // Return only the iteration time, not the count time
     elapsed
 }
 

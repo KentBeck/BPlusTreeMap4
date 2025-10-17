@@ -43,15 +43,14 @@ cargo run --release --bin bench_partial_iter -- 50000000 100 128
 
 ### Test Scenarios
 
-The benchmark runs five scenarios:
+The benchmark runs four scenarios:
 
 1. **From Beginning**: Iterate first N items using `items()` (NOT recommended for production)
 2. **From Middle**: Start from middle key and iterate N items forward (REAL-WORLD USE CASE)
-3. **From End**: Iterate last N items (requires finding the end first)
-4. **Random Positions**: Perform 100 separate partial iterations from random keys (REAL-WORLD USE CASE)
-5. **Cursor-like**: Perform 1000 tiny iterations of 10 items each (REAL-WORLD USE CASE: pagination)
+3. **Random Positions**: Perform 100 separate partial iterations from random keys (REAL-WORLD USE CASE)
+4. **Cursor-like**: Perform 1000 tiny iterations of 10 items each (REAL-WORLD USE CASE: pagination)
 
-**Focus on scenarios 2, 4, and 5** - these represent how B+ trees are actually used in production (database cursors, pagination, range queries from known keys).
+**Focus on scenarios 2, 3, and 4** - these represent how B+ trees are actually used in production (database cursors, pagination, range queries from known keys).
 
 ### Understanding the Results
 
