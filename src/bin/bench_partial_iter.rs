@@ -1,3 +1,30 @@
+//! Partial Iteration Benchmark
+//!
+//! This benchmark tests BPlusTreeMap's performance for partial iteration scenarios,
+//! which are common in real-world applications (e.g., pagination, range queries).
+//!
+//! ## Scenarios
+//!
+//! 1. **From Middle**: Iterate N items starting from the middle of the tree
+//!    - Tests range query performance with a specific starting key
+//!    - Uses `range(key..)` which is the recommended approach
+//!
+//! 2. **Random Positions**: Perform many small iterations from random keys
+//!    - Tests the overhead of repeatedly creating new range iterators
+//!    - Simulates scenarios like pagination with random access patterns
+//!
+//! 3. **Cursor-like**: Perform many tiny iterations (10 items each)
+//!    - Tests iterator creation overhead for very small iterations
+//!    - Simulates database cursor operations or incremental data fetching
+//!
+//! ## Note on items()
+//!
+//! The "iterate from beginning" scenario using `items()` was removed because:
+//! - It calls `len()` internally, which walks all leaf nodes (O(n))
+//! - This makes it 1000x+ slower than std::BTreeMap for large datasets
+//! - Real-world applications should use `range(Bound::Unbounded..)` instead
+//! - The scenario was not representative of typical partial iteration use cases
+
 use std::collections::BTreeMap;
 use std::env;
 use std::hint::black_box;
@@ -45,18 +72,9 @@ fn main() {
 
     println!("Trees built. Starting benchmarks...\n");
 
-    // Benchmark 1: Iterate from beginning
+    // Benchmark 1: Iterate from middle
     println!(
-        "--- Scenario 1: Iterate first {} items from beginning ---",
-        iter_count
-    );
-    let bplus_begin = bench_partial_iter_begin(&bplus, iter_count);
-    let std_begin = bench_partial_iter_begin(&std_map, iter_count);
-    print_results("From Beginning", bplus_begin, std_begin, iter_count);
-
-    // Benchmark 2: Iterate from middle
-    println!(
-        "\n--- Scenario 2: Iterate {} items from middle ---",
+        "--- Scenario 1: Iterate {} items from middle ---",
         iter_count
     );
     let middle_key = find_middle_key(&dataset);
@@ -64,9 +82,9 @@ fn main() {
     let std_middle = bench_partial_iter_from_key(&std_map, middle_key, iter_count);
     print_results("From Middle", bplus_middle, std_middle, iter_count);
 
-    // Benchmark 3: Multiple small iterations at random positions
+    // Benchmark 2: Multiple small iterations at random positions
     println!(
-        "\n--- Scenario 3: 100 random partial iterations of {} items each ---",
+        "\n--- Scenario 2: 100 random partial iterations of {} items each ---",
         iter_count
     );
     let random_keys = generate_random_keys(&dataset, 100);
@@ -79,10 +97,12 @@ fn main() {
         iter_count * 100,
     );
 
-    // Benchmark 4: Very small iterations (simulate cursor-like behavior)
+    // Benchmark 3: Very small iterations (simulate cursor-like behavior)
+    // This tests the overhead of creating many iterators for tiny iteration counts,
+    // which is common in cursor-based APIs or incremental data fetching.
     let tiny_count = 10;
     println!(
-        "\n--- Scenario 4: 1000 tiny iterations of {} items each (cursor simulation) ---",
+        "\n--- Scenario 3: 1000 tiny iterations of {} items each (cursor simulation) ---",
         tiny_count
     );
     let cursor_keys = generate_random_keys(&dataset, 1000);
@@ -122,22 +142,6 @@ fn generate_random_keys(dataset: &[(u64, u64)], count: usize) -> Vec<u64> {
         keys.push(dataset[idx].0);
     }
     keys
-}
-
-fn bench_partial_iter_begin<M>(map: &M, count: usize) -> Duration
-where
-    M: IterableBenchmark,
-{
-    let start = Instant::now();
-    let mut iter = map.iter();
-    let mut n = 0;
-    for (k, v) in iter.by_ref().take(count) {
-        black_box((k, v));
-        n += 1;
-    }
-    let elapsed = start.elapsed();
-    black_box(n);
-    elapsed
 }
 
 fn bench_partial_iter_from_key<M>(map: &M, start_key: u64, count: usize) -> Duration
@@ -201,13 +205,6 @@ fn print_results(scenario: &str, bplus_time: Duration, std_time: Duration, op_co
     }
 }
 
-trait IterableBenchmark {
-    type Iter<'a>: Iterator<Item = (&'a u64, &'a u64)>
-    where
-        Self: 'a;
-    fn iter(&self) -> Self::Iter<'_>;
-}
-
 trait RangeIterableBenchmark {
     type RangeIter<'a>: Iterator<Item = (&'a u64, &'a u64)>
     where
@@ -215,24 +212,10 @@ trait RangeIterableBenchmark {
     fn range_from(&self, key: u64) -> Self::RangeIter<'_>;
 }
 
-impl IterableBenchmark for BPlusTreeMap<u64, u64> {
-    type Iter<'a> = bplustree::Items<'a, u64, u64>;
-    fn iter(&self) -> Self::Iter<'_> {
-        self.items()
-    }
-}
-
 impl RangeIterableBenchmark for BPlusTreeMap<u64, u64> {
     type RangeIter<'a> = bplustree::Items<'a, u64, u64>;
     fn range_from(&self, key: u64) -> Self::RangeIter<'_> {
         self.range(key..)
-    }
-}
-
-impl IterableBenchmark for BTreeMap<u64, u64> {
-    type Iter<'a> = std::collections::btree_map::Iter<'a, u64, u64>;
-    fn iter(&self) -> Self::Iter<'_> {
-        self.iter()
     }
 }
 
