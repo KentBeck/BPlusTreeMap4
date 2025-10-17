@@ -1,0 +1,208 @@
+================================================================================
+PARTIAL ITERATION HOTSPOTS - QUICK REFERENCE
+================================================================================
+
+Date: October 17, 2025
+Analysis Method: Micro-benchmarking + code inspection
+Tree Size: 10M items, Capacity: 128
+
+================================================================================
+PERFORMANCE BASELINE
+================================================================================
+
+BPlusTreeMap vs std::BTreeMap:
+  From Middle (100 items):        2.6x FASTER ✓
+  Random Positions (10K items):   1.4x FASTER ✓
+  Cursor-like (10K items):        1.1x FASTER ✓
+
+Micro-benchmark results:
+  Iterator creation:              3.36ns    (optimal)
+  First next() initialization:    704.12ns  (🔥 PRIMARY HOTSPOT)
+  Per-item (within leaf):         2.86ns    (excellent)
+  Per-item (cross leaf):          4.18ns    (very good)
+  Leaf boundary crossing cost:    1.31ns    (minimal)
+
+================================================================================
+IDENTIFIED HOTSPOTS (Ranked by Impact)
+================================================================================
+
+🔥 HOTSPOT #1: Lazy Initialization in first next()
+   Location: src/iterate.rs:46-104
+   Cost: 704ns per iterator
+   Impact: Critical for small iterations (10-50 items)
+   Breakdown:
+     - leaf_for_key() tree traversal:  ~400-500ns (57%)
+     - carve_leaf() pointer math:      ~50-100ns  (11%)
+     - binary_search() in leaf:        ~50-100ns  (11%)
+     - Positioning logic:              ~50-100ns  (11%)
+
+   Optimization opportunities:
+     ⭐ Cache iterator positions (3-5x speedup for cursors)
+     ⭐ Hint-based positioning
+     • Prefetch during traversal
+     • Reduce carve_leaf calls
+
+🔥 HOTSPOT #2: Tree Traversal in leaf_for_key()
+   Location: src/common.rs:140-158
+   Cost: 400-500ns per call
+   Impact: 57% of initialization cost
+   Factors:
+     - Tree height (3-4 levels): ~100-150ns per level
+     - Cache misses from pointer chasing
+     - Binary search at each branch
+
+   Optimization opportunities:
+     ⭐ Iterator position caching
+     • Prefetch next tree level
+     • Branch prediction hints
+
+🟡 HOTSPOT #3: Binary Search in Leaf
+   Location: src/iterate.rs:65-88
+   Cost: 50-100ns per initialization
+   Impact: 7-14% of initialization cost
+   Factors:
+     - 7 comparisons for 128-item array (log2(128))
+     - Branch mispredictions
+
+   Optimization opportunities:
+     • Linear search for small leaves (<32 items)
+     • SIMD search for primitive types
+     • Branchless binary search
+
+🟡 HOTSPOT #4: Bound Checking in next()
+   Location: src/iterate.rs:110-122
+   Cost: 2-5ns per item (only for bounded ranges)
+   Impact: Shows in bounded range queries (9.23ns vs 2.86ns baseline)
+
+   Optimization opportunities:
+     ⭐ Specialized unbounded iterator (20-50% faster)
+     • Hoist bound check to per-leaf
+     • Branch prediction hints
+
+🟢 HOTSPOT #5: carve_leaf() Calls
+   Location: src/layout.rs:318-334
+   Cost: 30-50ns per call
+   Impact: Called during init + each leaf boundary crossing
+
+   Optimization opportunities:
+     • Cache leaf parts in iterator state
+     • Already has #[inline] attribute
+     ✓ Already quite efficient
+
+🟢 HOTSPOT #6: Leaf Boundary Crossing
+   Location: src/iterate.rs:124-136
+   Cost: 1.31ns extra per crossing
+   Impact: Minimal (already very efficient)
+
+   Optimization opportunities:
+     ⭐ Eliminate tail recursion (use loop instead)
+     • Prefetch next leaf
+     ✓ Already quite optimal
+
+================================================================================
+OPTIMIZATION PRIORITIES
+================================================================================
+
+HIGH PRIORITY (Do First):
+
+1. Eliminate Recursion in next()
+   Effort:     4-8 hours (Low)
+   Impact:     5-10% improvement
+   Trade-off:  None (pure win)
+   Status:     RECOMMENDED ⭐⭐⭐
+
+2. Iterator Position Caching
+   Effort:     2-3 days (Medium)
+   Impact:     3-5x for cursor workloads, 1.5-2x for random
+   Trade-off:  Cache invalidation on mutations
+   Status:     HIGH VALUE ⭐⭐⭐
+
+3. Specialized Unbounded Iterator
+   Effort:     1-2 days (Low-Medium)
+   Impact:     20-50% for unbounded ranges
+   Trade-off:  Code duplication
+   Status:     RECOMMENDED ⭐⭐
+
+MEDIUM PRIORITY (Nice to Have):
+
+4. Hoist Bound Checking to Per-Leaf
+   Effort:     1-2 days
+   Impact:     10-20% for bounded ranges
+   Trade-off:  More complex logic
+
+5. Cache leaf_parts in Iterator
+   Effort:     4-8 hours
+   Impact:     5-10% reduction in overhead
+   Trade-off:  Larger iterator struct
+
+LOW PRIORITY (Future Work):
+
+6. Prefetching During Traversal
+   Effort:     2-3 days
+   Impact:     10-20% for deep trees
+   Trade-off:  Architecture-specific
+
+7. SIMD Binary Search
+   Effort:     3-5 days
+   Impact:     10-20% faster initialization
+   Trade-off:  Type constraints, complexity
+
+================================================================================
+PERFORMANCE TARGETS
+================================================================================
+
+CONSERVATIVE (High Priority Only):
+  From Middle:        2.6x → 3.5x faster (+35%)
+  Random Positions:   1.4x → 2.0x faster (+43%)
+  Cursor-like:        1.1x → 4.0x faster (+264%)
+
+AGGRESSIVE (All Optimizations):
+  From Middle:        2.6x → 4.5x faster (+73%)
+  Random Positions:   1.4x → 3.0x faster (+114%)
+  Cursor-like:        1.1x → 5.5x faster (+400%)
+
+================================================================================
+IMPLEMENTATION ROADMAP
+================================================================================
+
+Phase 1: Quick Wins (1-2 weeks)
+  ✓ Eliminate recursion in next()
+  ✓ Add specialized unbounded iterator
+  ✓ Benchmark and validate improvements
+
+Phase 2: High-Value Optimizations (2-3 weeks)
+  • Implement iterator position caching
+  • Add cache invalidation on mutations
+  • Benchmark cursor-like workloads
+  • Tune cache size and eviction policy
+
+Phase 3: Polish (1-2 weeks)
+  • Hoist bound checking where profitable
+  • Cache leaf_parts in iterator state
+  • Profile and micro-optimize hot paths
+
+Phase 4: Advanced (Optional, 2-3 weeks)
+  • Add prefetching hints
+  • Experiment with SIMD search
+  • Architecture-specific optimizations
+
+================================================================================
+CURRENT STATUS
+================================================================================
+
+✅ Already production-ready and faster than std::BTreeMap
+✅ Excellent baseline performance (2.86ns per item)
+✅ Clear optimization path identified
+⚠️ Cursor-like workloads have most room for improvement
+
+Recommendation: Implement Phase 1 optimizations (quick wins) first, then
+reassess if further optimization is needed based on real-world usage patterns.
+
+================================================================================
+DETAILED ANALYSIS
+================================================================================
+
+See: PARTIAL_ITERATION_HOTSPOTS.md for full analysis with code examples,
+     detailed cost breakdowns, and optimization techniques.
+
+================================================================================

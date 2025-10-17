@@ -96,46 +96,49 @@ impl<'a, K: Ord, V> Iterator for Items<'a, K, V> {
                     }
                 }
 
-                let leaf = (*front_leaf)?;
-                unsafe {
-                    let parts = layout::carve_leaf::<K, V>(leaf, &tree.leaf_layout);
-                    let len = (*parts.hdr).len as usize;
+                // Loop to handle leaf boundary crossing without recursion
+                loop {
+                    let leaf = (*front_leaf)?;
+                    unsafe {
+                        let parts = layout::carve_leaf::<K, V>(leaf, &tree.leaf_layout);
+                        let len = (*parts.hdr).len as usize;
 
-                    if *front_idx < len {
-                        let k = &*(parts.keys_ptr.add(*front_idx) as *const K);
+                        if *front_idx < len {
+                            let k = &*(parts.keys_ptr.add(*front_idx) as *const K);
 
-                        // Check end bound
-                        let within_bound = match end_bound {
-                            Bound::Unbounded => true,
-                            Bound::Included(e) => k <= e,
-                            Bound::Excluded(e) => k < e,
-                        };
+                            // Check end bound
+                            let within_bound = match end_bound {
+                                Bound::Unbounded => true,
+                                Bound::Included(e) => k <= e,
+                                Bound::Excluded(e) => k < e,
+                            };
 
-                        if !within_bound {
+                            if !within_bound {
+                                *front_leaf = None;
+                                *remaining = 0;
+                                return None;
+                            }
+
+                            let v = &*(parts.vals_ptr.add(*front_idx) as *const V);
+                            *front_idx += 1;
+                            if *remaining > 0 {
+                                *remaining -= 1;
+                            }
+                            return Some((k, v));
+                        }
+
+                        // Move to next leaf
+                        let next_ptr = *parts.next_ptr;
+                        if next_ptr.is_null() {
                             *front_leaf = None;
                             *remaining = 0;
                             return None;
                         }
 
-                        let v = &*(parts.vals_ptr.add(*front_idx) as *const V);
-                        *front_idx += 1;
-                        if *remaining > 0 {
-                            *remaining -= 1;
-                        }
-                        return Some((k, v));
+                        *front_leaf = NonNull::new(next_ptr);
+                        *front_idx = 0;
+                        // Continue loop instead of recursive call
                     }
-
-                    // Move to next leaf
-                    let next_ptr = *parts.next_ptr;
-                    if next_ptr.is_null() {
-                        *front_leaf = None;
-                        *remaining = 0;
-                        return None;
-                    }
-
-                    *front_leaf = NonNull::new(next_ptr);
-                    *front_idx = 0;
-                    self.next()
                 }
             }
             ItemsInner::Vec { inner } => inner.next(),
