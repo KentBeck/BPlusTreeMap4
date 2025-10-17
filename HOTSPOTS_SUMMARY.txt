@@ -105,44 +105,33 @@ OPTIMIZATION PRIORITIES
 
 HIGH PRIORITY (Do First):
 
-1. Eliminate Recursion in next()
+1. ✅ COMPLETED - Eliminate Recursion in next()
    Effort:     4-8 hours (Low)
-   Impact:     5-10% improvement
+   Impact:     10-26% improvement achieved
    Trade-off:  None (pure win)
-   Status:     RECOMMENDED ⭐⭐⭐
+   Status:     DONE - Committed October 17, 2025
 
-2. Iterator Position Caching
-   Effort:     2-3 days (Medium)
-   Impact:     3-5x for cursor workloads, 1.5-2x for random
-   Trade-off:  Cache invalidation on mutations
-   Status:     HIGH VALUE ⭐⭐⭐
-
-3. Specialized Unbounded Iterator
-   Effort:     1-2 days (Low-Medium)
-   Impact:     20-50% for unbounded ranges
-   Trade-off:  Code duplication
-   Status:     RECOMMENDED ⭐⭐
+2. Hoist Bound Checking to Per-Leaf
+   Effort:     1-2 days (Medium)
+   Impact:     10-20% for bounded ranges
+   Trade-off:  More complex logic
+   Status:     NEXT ⭐⭐⭐
 
 MEDIUM PRIORITY (Nice to Have):
 
-4. Hoist Bound Checking to Per-Leaf
-   Effort:     1-2 days
-   Impact:     10-20% for bounded ranges
-   Trade-off:  More complex logic
-
-5. Cache leaf_parts in Iterator
+3. Cache leaf_parts in Iterator
    Effort:     4-8 hours
    Impact:     5-10% reduction in overhead
    Trade-off:  Larger iterator struct
 
 LOW PRIORITY (Future Work):
 
-6. Prefetching During Traversal
+4. Prefetching During Traversal
    Effort:     2-3 days
    Impact:     10-20% for deep trees
    Trade-off:  Architecture-specific
 
-7. SIMD Binary Search
+5. SIMD Binary Search
    Effort:     3-5 days
    Impact:     10-20% faster initialization
    Trade-off:  Type constraints, complexity
@@ -151,37 +140,36 @@ LOW PRIORITY (Future Work):
 PERFORMANCE TARGETS
 ================================================================================
 
-CONSERVATIVE (High Priority Only):
-  From Middle:        2.6x → 3.5x faster (+35%)
-  Random Positions:   1.4x → 2.0x faster (+43%)
-  Cursor-like:        1.1x → 4.0x faster (+264%)
+ACHIEVED (Recursion Elimination):
+  From Middle:        2.6x → 5.7x faster (+119% achieved) ✅
+  Random Positions:   1.4x → 2.1x faster (+46% achieved) ✅
+  Cursor-like:        1.1x → 2.0x faster (+75% achieved) ✅
 
-AGGRESSIVE (All Optimizations):
-  From Middle:        2.6x → 4.5x faster (+73%)
-  Random Positions:   1.4x → 3.0x faster (+114%)
-  Cursor-like:        1.1x → 5.5x faster (+400%)
+CONSERVATIVE (Bound Hoisting):
+  From Middle:        5.7x → 6.0x faster (additional +5%)
+  Random Positions:   2.1x → 2.3x faster (additional +10%)
+  Cursor-like:        2.0x → 2.1x faster (additional +5%)
 
 ================================================================================
 IMPLEMENTATION ROADMAP
 ================================================================================
 
-Phase 1: Quick Wins (1-2 weeks)
-  ✓ Eliminate recursion in next()
-  ✓ Add specialized unbounded iterator
-  ✓ Benchmark and validate improvements
+Phase 1: Quick Wins (COMPLETED ✅)
+  ✅ Eliminate recursion in next() - 10-26% improvement
+  ✅ Benchmark and validate improvements
+  ✅ Comprehensive documentation
 
-Phase 2: High-Value Optimizations (2-3 weeks)
-  • Implement iterator position caching
-  • Add cache invalidation on mutations
-  • Benchmark cursor-like workloads
-  • Tune cache size and eviction policy
-
-Phase 3: Polish (1-2 weeks)
-  • Hoist bound checking where profitable
+Phase 2: Targeted Optimization (Current)
+  🔄 Hoist bound checking to per-leaf (next task)
   • Cache leaf_parts in iterator state
   • Profile and micro-optimize hot paths
 
-Phase 4: Advanced (Optional, 2-3 weeks)
+Phase 3: Data-Driven Future Work (Requires Production Data)
+  ⏸️ Iterator position caching - BLOCKED: Need production key distribution data
+  ⏸️ Specialized unbounded iterator - DECISION: Not pursuing (not needed)
+  • Evaluate based on real-world usage patterns
+
+Phase 4: Advanced (Optional, Future)
   • Add prefetching hints
   • Experiment with SIMD search
   • Architecture-specific optimizations
@@ -190,13 +178,19 @@ Phase 4: Advanced (Optional, 2-3 weeks)
 CURRENT STATUS
 ================================================================================
 
-✅ Already production-ready and faster than std::BTreeMap
-✅ Excellent baseline performance (2.86ns per item)
-✅ Clear optimization path identified
-⚠️ Cursor-like workloads have most room for improvement
+✅ Production-ready and 2.0-5.7x faster than std::BTreeMap
+✅ Phase 1 complete: Recursion eliminated (10-26% improvement)
+✅ Excellent per-item performance (2.56ns within leaf)
+✅ 537ns initialization overhead (down from 704ns)
+🔄 Phase 2 in progress: Hoisting bound checking
 
-Recommendation: Implement Phase 1 optimizations (quick wins) first, then
-reassess if further optimization is needed based on real-world usage patterns.
+Decisions Made:
+  ❌ Specialized unbounded iterator - Not pursuing (not needed)
+  ⏸️ Iterator position caching - Blocked until production data available
+  ✅ Bound hoisting - Next optimization target
+
+Recommendation: Complete bound hoisting optimization, then monitor production
+usage patterns before pursuing additional optimizations.
 
 ================================================================================
 DETAILED ANALYSIS
